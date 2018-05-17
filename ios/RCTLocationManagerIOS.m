@@ -1,7 +1,9 @@
 #import "RCTLocationManagerIOS.h"
 
 #import <CoreLocation/CLError.h>
+#import <CoreLocation/CLHeading.h>
 #import <CoreLocation/CLRegion.h>
+#import <CoreLocation/CLCircularRegion.h>
 #import <CoreLocation/CLLocationManager.h>
 #import <CoreLocation/CLLocationManagerDelegate.h>
 
@@ -18,7 +20,7 @@
   CLLocationDegrees longitude = [RCTConvert double:region[@"radius"]];
   CLLocationCoordinate2D center = CLLocationCoordinate2DMake(latitude, longitude);
   
-  return [[CLCircularRegion alloc] initWithCenter: centre
+  return [[CLCircularRegion alloc] initWithCenter: center
                                            radius: radius
                                        identifier: region[@"identifier"]];
 }
@@ -35,6 +37,7 @@
 
 CLLocationManager *locationManager;
 bool hasListeners;
+
 
 #pragma mark Lifecycle
 
@@ -64,6 +67,7 @@ bool hasListeners;
   locationManager.delegate = nil;
 }
 
+
 #pragma mark - CLLocationManagerDelegate
 
 - (void)locationManager:(CLLocationManager *)manager
@@ -79,6 +83,13 @@ bool hasListeners;
   if (!hasListeners) return;
   [self sendEventWithName:@"didFailWithError" body:error];
 }
+
+- (void)locationManager:(CLLocationManager *)manager
+               didVisit:(CLVisit *)visit
+{
+  //TODO
+}
+
 
 #pragma mark API
 
@@ -252,6 +263,11 @@ RCT_EXPORT_METHOD(disallowDeferredLocationUpdates)
 
 #pragma mark Getters
 
+RCT_EXPORT_METHOD(maximumRegionMonitoringDistance:(RCTPromiseResolveBlock)resolve reject:(RCTPromiseRejectBlock) reject)
+{
+  resolve(@(locationManager.maximumRegionMonitoringDistance));
+}
+
 RCT_EXPORT_METHOD(monitoredRegions:(RCTPromiseResolveBlock)resolve reject:(RCTPromiseRejectBlock) reject)
 {
   // TODO
@@ -316,12 +332,6 @@ RCT_EXPORT_METHOD(headingOrientation:(CLDeviceOrientation) headingOrientation)
 {
   locationManager.headingOrientation = headingOrientation;
 }
-
-RCT_EXPORT_METHOD(maximumRegionMonitoringDistance:(CLLocationDistance) maxDistance)
-{
-  locationManager.maximumRegionMonitoringDistance = maxDistance;
-}
-
 
 
 #pragma mark - Converters
