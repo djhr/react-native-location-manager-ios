@@ -48,33 +48,13 @@ bool hasListeners;
      didUpdateLocations:(NSArray<CLLocation *> *)locations
 {
   if (!hasListeners) return;
-  /*CLLocation *location = locations.lastObject;
-  NSDictionary<NSString *, id> *json = @{
-                                      @"altitude": @(location.altitude),
-                                      @"horizontalAccuracy": @(location.horizontalAccuracy),
-                                      @"verticalAccuracy": @(location.verticalAccuracy),
-                                      @"speed": @(location.speed),
-                                      @"course": @(location.course),
-                                      @"timestamp": @(location.timestamp)
-                                      @"coordinate": @{
-                                          @"latitude": @(location.coordinate.latitude),
-                                          @"longitude": @(location.coordinate.longitude)
-                                          }
-                                      };*/
-
-  [self sendEventWithName:@"DidUpdateLocations" body:locations];
+  [self sendEventWithName:@"DidUpdateLocations" body:JSONLocationArray(locations)];
 }
 
 - (void)locationManager:(CLLocationManager *)manager
        didFailWithError:(NSError *)error
 {
   if (!hasListeners) return;
-  /*NSDictionary<NSString *, id> *err = @{
-    @"code": @(error.code),
-    @"domain": error.domain,
-    @"userInfo": error.userInfo
-  };*/
-
   [self sendEventWithName:@"DidFailWithError" body:error];
 }
 
@@ -150,6 +130,35 @@ RCT_EXPORT_METHOD(startUpdatingHeading) {
 
 RCT_EXPORT_METHOD(stopUpdatingHeading) {
   [locationManager stopUpdatingHeading];
+}
+
+
+#pragma mark - Converters
+
+static NSDictionary<NSString*, id> *JSONLocation(CLLocation *location)
+{
+  return @{
+           @"altitude": @(location.altitude),
+           @"horizontalAccuracy": @(location.horizontalAccuracy),
+           @"verticalAccuracy": @(location.verticalAccuracy),
+           @"speed": @(location.speed),
+           @"course": @(location.course),
+           @"timestamp": @(location.timestamp)
+           @"coordinate": @{
+               @"latitude": @(location.coordinate.latitude),
+               @"longitude": @(location.coordinate.longitude)
+               }
+           };
+}
+
+static NSArray<NSDictionary<NSString*, id>*> *JSONLocationArray(NSArray<CLLocation*> *locations)
+{
+  NSMutableArray *arr = [[NSMutableArray alloc] initWithCapacity:locations.count];
+  for (CLLocation *location in locations) {
+    [arr addObject:JSONLocation(location)];
+  }
+  
+  return [arr copy];
 }
 
 @end
