@@ -12,11 +12,36 @@
 #import <React/RCTConvert.h>
 
 
-@implementation RCTConvert (CLRegion)
+@implementation RCTConvert (RCTLocationManagerIOS)
+
++ (CLLocationDistance)CLLocationDistance:(id)json
+{
+  return [RCTConvert double:json];
+}
+
++ (CLLocationAccuracy)CLLocationAccuracy:(id)json
+{
+  return [RCTConvert double:json];
+}
+
++ (CLActivityType)CLActivityType:(id)json
+{
+  return (CLActivityType)[RCTConvert int:json];
+}
+
++ (CLLocationDegrees)CLLocationDegrees:(id)json
+{
+  return [RCTConvert double:json];
+}
+
++ (CLDeviceOrientation)CLDeviceOrientation:(id)json
+{
+  return (CLDeviceOrientation)[RCTConvert int:json];
+}
 
 + (CLRegion *)CLRegion:(id)json
 {
-  return [self CLCircularRegion:json];
+  return [RCTConvert CLCircularRegion:json];
 }
 
 + (CLCircularRegion *)CLCircularRegion:(id)json
@@ -213,32 +238,38 @@ RCT_EXPORT_MODULE();
 
 #pragma mark Class Methods
 
-RCT_EXPORT_METHOD(authorizationStatus:(RCTPromiseResolveBlock)resolve reject:(RCTPromiseRejectBlock) reject)
+RCT_EXPORT_METHOD(authorizationStatus:(RCTPromiseResolveBlock)resolve
+                         withRejecter:(RCTPromiseRejectBlock) reject)
 {
   resolve(@([CLLocationManager authorizationStatus]));
 }
 
-RCT_EXPORT_METHOD(locationServicesEnabled:(RCTPromiseResolveBlock)resolve reject:(RCTPromiseRejectBlock) reject)
+RCT_EXPORT_METHOD(locationServicesEnabled:(RCTPromiseResolveBlock)resolve
+                             withRejecter:(RCTPromiseRejectBlock) reject)
 {
   resolve(@([CLLocationManager locationServicesEnabled]));
 }
 
-RCT_EXPORT_METHOD(deferredLocationUpdatesAvailable:(RCTPromiseResolveBlock)resolve reject:(RCTPromiseRejectBlock) reject)
+RCT_EXPORT_METHOD(deferredLocationUpdatesAvailable:(RCTPromiseResolveBlock)resolve
+                                      withRejecter:(RCTPromiseRejectBlock) reject)
 {
   resolve(@([CLLocationManager deferredLocationUpdatesAvailable]));
 }
 
-RCT_EXPORT_METHOD(significantLocationChangeMonitoringAvailable:(RCTPromiseResolveBlock)resolve reject:(RCTPromiseRejectBlock) reject)
+RCT_EXPORT_METHOD(significantLocationChangeMonitoringAvailable:(RCTPromiseResolveBlock)resolve
+                                                  withRejecter:(RCTPromiseRejectBlock) reject)
 {
   resolve(@([CLLocationManager significantLocationChangeMonitoringAvailable]));
 }
 
-RCT_EXPORT_METHOD(headingAvailable:(RCTPromiseResolveBlock)resolve reject:(RCTPromiseRejectBlock) reject)
+RCT_EXPORT_METHOD(headingAvailable:(RCTPromiseResolveBlock)resolve
+                      withRejecter:(RCTPromiseRejectBlock) reject)
 {
   resolve(@([CLLocationManager headingAvailable]));
 }
 
-RCT_EXPORT_METHOD(isRangingAvailable:(RCTPromiseResolveBlock)resolve reject:(RCTPromiseRejectBlock) reject)
+RCT_EXPORT_METHOD(isRangingAvailable:(RCTPromiseResolveBlock)resolve
+                        withRejecter:(RCTPromiseRejectBlock) reject)
 {
   resolve(@([CLLocationManager isRangingAvailable]));
 }
@@ -331,7 +362,8 @@ RCT_EXPORT_METHOD(stopMonitoringVisits)
   [locationManager stopMonitoringVisits];
 }
 
-RCT_EXPORT_METHOD(allowDeferredLocationUpdatesUntilTraveled:(CLLocationDistance)distance timeout:(NSTimeInterval) timeout)
+RCT_EXPORT_METHOD(allowDeferredLocationUpdatesUntilTraveled:(CLLocationDistance)distance
+                                                    timeout:(NSTimeInterval) timeout)
 {
   [locationManager allowDeferredLocationUpdatesUntilTraveled: distance
                                                      timeout: timeout];
@@ -434,33 +466,31 @@ RCT_EXPORT_METHOD(setHeadingOrientation:(CLDeviceOrientation) headingOrientation
 }
 
 RCT_EXPORT_METHOD(getMaximumRegionMonitoringDistance:(RCTPromiseResolveBlock)resolve
-                                              reject:(RCTPromiseRejectBlock) reject)
+                                        withRejecter:(RCTPromiseRejectBlock) reject)
 {
   resolve(@(locationManager.maximumRegionMonitoringDistance));
 }
 
 RCT_EXPORT_METHOD(getMonitoredRegions:(RCTPromiseResolveBlock)resolve
-                               reject:(RCTPromiseRejectBlock) reject)
+                         withRejecter:(RCTPromiseRejectBlock) reject)
 {
-  // TODO
-  resolve(locationManager.monitoredRegions);
+  resolve(JSONRegionArray(locationManager.monitoredRegions));
 }
 
 RCT_EXPORT_METHOD(getRangedRegions:(RCTPromiseResolveBlock)resolve
-                            reject:(RCTPromiseRejectBlock) reject)
+                      withRejecter:(RCTPromiseRejectBlock) reject)
 {
-  // TODO
-  resolve(locationManager.rangedRegions);
+  resolve(JSONRegionArray(locationManager.rangedRegions));
 }
 
 RCT_EXPORT_METHOD(getLocation:(RCTPromiseResolveBlock)resolve
-                       reject:(RCTPromiseRejectBlock) reject)
+                 withRejecter:(RCTPromiseRejectBlock) reject)
 {
   resolve(JSONLocation(locationManager.location));
 }
 
 RCT_EXPORT_METHOD(getHeading:(RCTPromiseResolveBlock)resolve
-                      reject:(RCTPromiseRejectBlock) reject)
+                withRejecter:(RCTPromiseRejectBlock) reject)
 {
   resolve(JSONHeading(locationManager.heading));
 }
@@ -490,6 +520,37 @@ static NSArray<NSDictionary<NSString*, id>*> *JSONLocationArray(NSArray<CLLocati
   NSMutableArray *arr = [[NSMutableArray alloc] initWithCapacity:locations.count];
   for (CLLocation *location in locations) {
     [arr addObject:JSONLocation(location)];
+  }
+
+  return [arr copy];
+}
+
+static NSDictionary<NSString*, id> *JSONRegion(CLRegion *region)
+{
+  if ([region isKindOfClass:[CLCircularRegion class]]) {
+    return JSONCircularRegion((CLCircularRegion *) region);
+  }
+
+  return @{@"identifier": region.identifier};
+}
+
+static NSDictionary<NSString*, id> *JSONCircularRegion(CLCircularRegion *region)
+{
+  return @{
+           @"identifier": region.identifier,
+           @"radius": @(region.radius),
+           @"center": @{
+               @"latitude": @(region.center.latitude),
+               @"longitude": @(region.center.longitude)
+               }
+           };
+}
+
+static NSArray<NSDictionary<NSString*, id>*> *JSONRegionArray(NSSet<__kindof CLRegion *> *regions)
+{
+  NSMutableArray *arr = [[NSMutableArray alloc] initWithCapacity:regions.count];
+  for (CLRegion *region in regions) {
+    [arr addObject:JSONRegion(region)];
   }
 
   return [arr copy];
