@@ -343,76 +343,126 @@ RCT_EXPORT_METHOD(disallowDeferredLocationUpdates)
 }
 
 
-#pragma mark Getters
+#pragma mark Getters/Setters
 
-RCT_EXPORT_METHOD(maximumRegionMonitoringDistance:(RCTPromiseResolveBlock)resolve reject:(RCTPromiseRejectBlock) reject)
+RCT_EXPORT_METHOD(getPausesLocationUpdatesAutomatically:(RCTPromiseResolveBlock) resolve
+                                           withRejecter:(RCTPromiseRejectBlock) reject)
+{
+  resolve(@(locationManager.pausesLocationUpdatesAutomatically));
+}
+
+RCT_EXPORT_METHOD(setPausesLocationUpdatesAutomatically:(BOOL) value)
+{
+  locationManager.pausesLocationUpdatesAutomatically = value;
+}
+
+RCT_EXPORT_METHOD(getAllowsBackgroundLocationUpdates:(RCTPromiseResolveBlock) resolve
+                                        withRejecter:(RCTPromiseRejectBlock) reject)
+{
+  resolve(@(locationManager.allowsBackgroundLocationUpdates));
+}
+
+RCT_EXPORT_METHOD(setAllowsBackgroundLocationUpdates:(BOOL) value)
+{
+  locationManager.allowsBackgroundLocationUpdates = value;
+}
+
+RCT_EXPORT_METHOD(getShowsBackgroundLocationIndicator:(RCTPromiseResolveBlock) resolve
+                                         withRejecter:(RCTPromiseRejectBlock) reject)
+{
+  resolve(@(locationManager.showsBackgroundLocationIndicator));
+}
+
+RCT_EXPORT_METHOD(setShowsBackgroundLocationIndicator:(BOOL) value)
+{
+  locationManager.showsBackgroundLocationIndicator = value;
+}
+
+RCT_EXPORT_METHOD(getDistanceFilter:(RCTPromiseResolveBlock) resolve
+                       withRejecter:(RCTPromiseRejectBlock) reject)
+{
+  resolve(@(locationManager.distanceFilter));
+}
+
+RCT_EXPORT_METHOD(setDistanceFilter:(CLLocationDistance) distance)
+{
+  locationManager.distanceFilter = distance;
+}
+
+RCT_EXPORT_METHOD(getDesiredAccuracy:(RCTPromiseResolveBlock) resolve
+                        withRejecter:(RCTPromiseRejectBlock) reject)
+{
+  resolve(@(locationManager.desiredAccuracy));
+}
+
+RCT_EXPORT_METHOD(setDesiredAccuracy:(CLLocationAccuracy) accuracy)
+{
+  locationManager.desiredAccuracy = accuracy;
+}
+
+RCT_EXPORT_METHOD(getActivityType:(RCTPromiseResolveBlock) resolve
+                     withRejecter:(RCTPromiseRejectBlock) reject)
+{
+  resolve(@(locationManager.activityType));
+}
+
+RCT_EXPORT_METHOD(setActivityType:(CLActivityType) activityType)
+{
+  locationManager.activityType = activityType;
+}
+
+RCT_EXPORT_METHOD(getHeadingFilter:(RCTPromiseResolveBlock) resolve
+                      withRejecter:(RCTPromiseRejectBlock) reject)
+{
+  resolve(@(locationManager.headingFilter));
+}
+
+RCT_EXPORT_METHOD(setHeadingFilter:(CLLocationDegrees) headingFilter)
+{
+  locationManager.headingFilter = headingFilter;
+}
+
+RCT_EXPORT_METHOD(getHeadingOrientation:(RCTPromiseResolveBlock) resolve
+                           withRejecter:(RCTPromiseRejectBlock) reject)
+{
+  resolve(@(locationManager.headingOrientation));
+}
+
+RCT_EXPORT_METHOD(setHeadingOrientation:(CLDeviceOrientation) headingOrientation)
+{
+  locationManager.headingOrientation = headingOrientation;
+}
+
+RCT_EXPORT_METHOD(getMaximumRegionMonitoringDistance:(RCTPromiseResolveBlock)resolve
+                                              reject:(RCTPromiseRejectBlock) reject)
 {
   resolve(@(locationManager.maximumRegionMonitoringDistance));
 }
 
-RCT_EXPORT_METHOD(monitoredRegions:(RCTPromiseResolveBlock)resolve reject:(RCTPromiseRejectBlock) reject)
+RCT_EXPORT_METHOD(getMonitoredRegions:(RCTPromiseResolveBlock)resolve
+                               reject:(RCTPromiseRejectBlock) reject)
 {
   // TODO
   resolve(locationManager.monitoredRegions);
 }
 
-RCT_EXPORT_METHOD(rangedRegions:(RCTPromiseResolveBlock)resolve reject:(RCTPromiseRejectBlock) reject)
+RCT_EXPORT_METHOD(getRangedRegions:(RCTPromiseResolveBlock)resolve
+                            reject:(RCTPromiseRejectBlock) reject)
 {
   // TODO
   resolve(locationManager.rangedRegions);
 }
 
-RCT_EXPORT_METHOD(location:(RCTPromiseResolveBlock)resolve reject:(RCTPromiseRejectBlock) reject)
+RCT_EXPORT_METHOD(getLocation:(RCTPromiseResolveBlock)resolve
+                       reject:(RCTPromiseRejectBlock) reject)
 {
   resolve(JSONLocation(locationManager.location));
 }
 
-RCT_EXPORT_METHOD(heading:(RCTPromiseResolveBlock)resolve reject:(RCTPromiseRejectBlock) reject)
+RCT_EXPORT_METHOD(getHeading:(RCTPromiseResolveBlock)resolve
+                      reject:(RCTPromiseRejectBlock) reject)
 {
   resolve(JSONHeading(locationManager.heading));
-}
-
-
-#pragma mark Setters
-
-RCT_EXPORT_METHOD(pausesLocationUpdatesAutomatically:(BOOL) value)
-{
-  locationManager.pausesLocationUpdatesAutomatically = value;
-}
-
-RCT_EXPORT_METHOD(allowsBackgroundLocationUpdates:(BOOL) value)
-{
-  locationManager.allowsBackgroundLocationUpdates = value;
-}
-
-RCT_EXPORT_METHOD(showsBackgroundLocationIndicator:(BOOL) value)
-{
-  locationManager.showsBackgroundLocationIndicator = value;
-}
-
-RCT_EXPORT_METHOD(distanceFilter:(CLLocationDistance) distance)
-{
-  locationManager.distanceFilter = distance;
-}
-
-RCT_EXPORT_METHOD(desiredAccuracy:(CLLocationAccuracy) accuracy)
-{
-  locationManager.desiredAccuracy = accuracy;
-}
-
-RCT_EXPORT_METHOD(activityType:(CLActivityType) activityType)
-{
-  locationManager.activityType = activityType;
-}
-
-RCT_EXPORT_METHOD(headingFilter:(CLLocationDegrees) headingFilter)
-{
-  locationManager.headingFilter = headingFilter;
-}
-
-RCT_EXPORT_METHOD(headingOrientation:(CLDeviceOrientation) headingOrientation)
-{
-  locationManager.headingOrientation = headingOrientation;
 }
 
 
