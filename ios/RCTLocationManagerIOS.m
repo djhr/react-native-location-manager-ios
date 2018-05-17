@@ -48,14 +48,14 @@ bool hasListeners;
      didUpdateLocations:(NSArray<CLLocation *> *)locations
 {
   if (!hasListeners) return;
-  [self sendEventWithName:@"DidUpdateLocations" body:JSONLocationArray(locations)];
+  [self sendEventWithName:@"didUpdateLocations" body:JSONLocationArray(locations)];
 }
 
 - (void)locationManager:(CLLocationManager *)manager
        didFailWithError:(NSError *)error
 {
   if (!hasListeners) return;
-  [self sendEventWithName:@"DidFailWithError" body:error];
+  [self sendEventWithName:@"didFailWithError" body:error];
 }
 
 #pragma mark API
@@ -64,7 +64,7 @@ RCT_EXPORT_MODULE();
 
 - (NSArray<NSString *> *)supportedEvents
 {
-  return @[@"DidUpdateLocations", @"DidFailWithError"];
+  return @[@"didUpdateLocations", @"didFailWithError"];
 }
 
 #pragma mark Class Methods

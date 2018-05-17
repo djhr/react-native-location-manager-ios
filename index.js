@@ -4,5 +4,9 @@ const Emitter = new NativeEventEmitter(NativeModules.LocationManagerIOS);
 
 export default {
     ...NativeModules.LocationManagerIOS,
-    addListener: (evt, fn) => Emitter.addListener(evt, fn)
+    addListener: (evt, fn) => Emitter.addListener(evt, fn),
+    Events: {
+        didUpdateLocations: 'didUpdateLocations',
+        didFailWithError: 'didFailWithError',
+    },
 };
