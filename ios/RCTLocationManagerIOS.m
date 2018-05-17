@@ -87,13 +87,19 @@ bool hasListeners;
 - (void)locationManager:(CLLocationManager *)manager
                didVisit:(CLVisit *)visit
 {
-  //TODO
+  if (!hasListeners) return;
+  [self sendEventWithName:@"didVisit" body:visit];
 }
 
 
 #pragma mark API
 
 RCT_EXPORT_MODULE();
+
+- (NSArray<NSString *> *)supportedEvents
+{
+  return @[@"didUpdateLocations", @"didFailWithError", @"didVisit"];
+}
 
 - (NSDictionary *)constantsToExport
 {
@@ -124,10 +130,6 @@ RCT_EXPORT_MODULE();
            };
 }
 
-- (NSArray<NSString *> *)supportedEvents
-{
-  return @[@"didUpdateLocations", @"didFailWithError"];
-}
 
 #pragma mark Class Methods
 

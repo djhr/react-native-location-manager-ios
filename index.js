@@ -8,5 +8,6 @@ export default {
     Events: {
         didUpdateLocations: 'didUpdateLocations',
         didFailWithError: 'didFailWithError',
+        didVisit: 'didVisit',
     },
 };
