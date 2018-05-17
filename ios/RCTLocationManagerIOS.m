@@ -65,10 +65,19 @@
 {
   NSDictionary<NSString *, id> *beacon = [RCTConvert NSDictionary:json];
 
-  return [[CLBeaconRegion alloc] initWithProximityUUID: beacon[@"proximityUUID"]
-                                                 major: [RCTConvert uint64_t:beacon[@"major"]]
-                                                 minor: [RCTConvert uint64_t:beacon[@"minor"]]
-                                            identifier: beacon[@"identifier"]];
+  if (beacon[@"major"] == NULL && beacon[@"minor"] == NULL) {
+    return [[CLBeaconRegion alloc] initWithProximityUUID: beacon[@"proximityUUID"]
+                                              identifier: beacon[@"identifier"]];
+  } else if (beacon[@"major"] != NULL && beacon[@"minor"] == NULL) {
+    return [[CLBeaconRegion alloc] initWithProximityUUID: beacon[@"proximityUUID"]
+                                                   major: [RCTConvert uint64_t:beacon[@"major"]]
+                                              identifier: beacon[@"identifier"]];
+  } else {
+    return [[CLBeaconRegion alloc] initWithProximityUUID: beacon[@"proximityUUID"]
+                                                   major: [RCTConvert uint64_t:beacon[@"major"]]
+                                                   minor: [RCTConvert uint64_t:beacon[@"minor"]]
+                                              identifier: beacon[@"identifier"]];
+  }
 }
 
 @end
