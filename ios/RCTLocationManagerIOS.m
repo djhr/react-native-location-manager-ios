@@ -2,10 +2,12 @@
 
 #import <CoreLocation/CLError.h>
 #import <CoreLocation/CLHeading.h>
+#import <CoreLocation/CLVisit.h>
 #import <CoreLocation/CLRegion.h>
 #import <CoreLocation/CLCircularRegion.h>
 #import <CoreLocation/CLLocationManager.h>
 #import <CoreLocation/CLLocationManagerDelegate.h>
+#import <CoreLocation/CLLocationManager+CLVisitExtensions.h>
 
 #import <React/RCTConvert.h>
 
@@ -19,7 +21,7 @@
   CLLocationDegrees latitude = [RCTConvert double:region[@"radius"]];
   CLLocationDegrees longitude = [RCTConvert double:region[@"radius"]];
   CLLocationCoordinate2D center = CLLocationCoordinate2DMake(latitude, longitude);
-  
+
   return [[CLCircularRegion alloc] initWithCenter: center
                                            radius: radius
                                        identifier: region[@"identifier"]];
@@ -336,6 +338,7 @@ RCT_EXPORT_METHOD(headingOrientation:(CLDeviceOrientation) headingOrientation)
 }
 
 
+
 #pragma mark - Converters
 
 static NSDictionary<NSString*, id> *JSONLocation(CLLocation *location)
@@ -360,7 +363,7 @@ static NSArray<NSDictionary<NSString*, id>*> *JSONLocationArray(NSArray<CLLocati
   for (CLLocation *location in locations) {
     [arr addObject:JSONLocation(location)];
   }
-  
+
   return [arr copy];
 }
 
