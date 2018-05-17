@@ -16,6 +16,11 @@
 
 + (CLRegion *)CLRegion:(id)json
 {
+  return [self CLCircularRegion:json];
+}
+
++ (CLCircularRegion *)CLCircularRegion:(id)json
+{
   NSDictionary<NSString *, id> *region = [RCTConvert NSDictionary:json];
   double radius = [RCTConvert double:region[@"radius"]];
   CLLocationDegrees latitude = [RCTConvert double:region[@"latitude"]];
