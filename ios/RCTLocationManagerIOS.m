@@ -143,7 +143,7 @@ static NSDictionary<NSString*, id> *JSONLocation(CLLocation *location)
            @"verticalAccuracy": @(location.verticalAccuracy),
            @"speed": @(location.speed),
            @"course": @(location.course),
-           @"timestamp": @([location.timestamp timeIntervalSince1970] * 1000) // ms
+           @"timestamp": @([location.timestamp timeIntervalSince1970] * 1000), // ms
            @"coordinate": @{
                @"latitude": @(location.coordinate.latitude),
                @"longitude": @(location.coordinate.longitude)
