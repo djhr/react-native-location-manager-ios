@@ -8,6 +8,14 @@ export default {
     Events: {
         didUpdateLocations: 'didUpdateLocations',
         didFailWithError: 'didFailWithError',
+        didUpdateHeading: 'didUpdateHeading',
+        didEnterRegion: 'didEnterRegion',
+        didExitRegion: 'didExitRegion',
+        monitoringDidFailForRegion: 'monitoringDidFailForRegion',
+        didRangeBeaconsInRegion: 'didRangeBeaconsInRegion',
+        rangingBeaconsDidFailForRegion: 'rangingBeaconsDidFailForRegion',
+        didDetermineStateForRegion: 'didDetermineStateForRegion',
         didVisit: 'didVisit',
+        didFinishDeferredUpdatesWithError: 'didFinishDeferredUpdatesWithError',
     },
 };

@@ -92,10 +92,70 @@ bool hasListeners;
 }
 
 - (void)locationManager:(CLLocationManager *)manager
+       didUpdateHeading:(CLHeading *)newHeading
+{
+  if (!hasListeners) return;
+  [self sendEventWithName:@"didUpdateHeading" body:newHeading];
+}
+
+- (void)locationManager:(CLLocationManager *)manager
+         didEnterRegion:(CLRegion *)region
+{
+  if (!hasListeners) return;
+  [self sendEventWithName:@"didEnterRegion" body:region];
+}
+
+- (void)locationManager:(CLLocationManager *)manager
+          didExitRegion:(CLRegion *)region
+{
+  if (!hasListeners) return;
+  [self sendEventWithName:@"didExitRegion" body:region];
+}
+
+- (void)locationManager:(CLLocationManager *)manager
+monitoringDidFailForRegion:(CLRegion *)region
+              withError:(NSError *)error
+{
+  if (!hasListeners) return;
+  [self sendEventWithName:@"monitoringDidFailForRegion" body:@{@"region": region, @"error": error}];
+}
+
+- (void)locationManager:(CLLocationManager *)manager
+        didRangeBeacons:(NSArray<CLBeacon *> *)beacons
+               inRegion:(CLBeaconRegion *)region
+{
+  if (!hasListeners) return;
+  [self sendEventWithName:@"didRangeBeaconsInRegion" body:@{@"beacons": beacons, @"region": region}];
+}
+
+- (void)locationManager:(CLLocationManager *)manager
+rangingBeaconsDidFailForRegion:(CLBeaconRegion *)region
+              withError:(NSError *)error
+{
+  if (!hasListeners) return;
+  [self sendEventWithName:@"rangingBeaconsDidFailForRegion" body:@{@"region": region, @"error": error}];
+}
+
+- (void)locationManager:(CLLocationManager *)manager
+      didDetermineState:(CLRegionState)state
+              forRegion:(CLRegion *)region
+{
+  if (!hasListeners) return;
+  [self sendEventWithName:@"didDetermineStateForRegion" body:@{@"state": @(state), @"region": region}];
+}
+
+- (void)locationManager:(CLLocationManager *)manager
                didVisit:(CLVisit *)visit
 {
   if (!hasListeners) return;
   [self sendEventWithName:@"didVisit" body:visit];
+}
+
+- (void)locationManager:(CLLocationManager *)manager
+didFinishDeferredUpdatesWithError:(NSError *)error
+{
+  if (!hasListeners) return;
+  [self sendEventWithName:@"didFinishDeferredUpdatesWithError" body:error];
 }
 
 
@@ -105,7 +165,17 @@ RCT_EXPORT_MODULE();
 
 - (NSArray<NSString *> *)supportedEvents
 {
-  return @[@"didUpdateLocations", @"didFailWithError", @"didVisit"];
+  return @[@"didUpdateLocations",
+           @"didFailWithError",
+           @"didUpdateHeading",
+           @"didEnterRegion",
+           @"didExitRegion",
+           @"monitoringDidFailForRegion",
+           @"didRangeBeaconsInRegion",
+           @"rangingBeaconsDidFailForRegion",
+           @"didDetermineStateForRegion",
+           @"didVisit",
+           @"didFinishDeferredUpdatesWithError"];
 }
 
 - (NSDictionary *)constantsToExport
@@ -134,6 +204,9 @@ RCT_EXPORT_MODULE();
            @"DeviceOrientationLandscapeRight": @(CLDeviceOrientationLandscapeRight),
            @"DeviceOrientationFaceUp": @(CLDeviceOrientationFaceUp),
            @"DeviceOrientationFaceDown": @(CLDeviceOrientationFaceDown),
+           @"RegionStateUnknown": @(CLRegionStateUnknown),
+           @"RegionStateInside": @(CLRegionStateInside),
+           @"RegionStateOutside": @(CLRegionStateOutside)
            };
 }
 
