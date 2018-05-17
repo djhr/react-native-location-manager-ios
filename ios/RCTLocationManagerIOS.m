@@ -4,6 +4,7 @@
 #import <CoreLocation/CLHeading.h>
 #import <CoreLocation/CLVisit.h>
 #import <CoreLocation/CLRegion.h>
+#import <CoreLocation/CLBeaconRegion.h>
 #import <CoreLocation/CLCircularRegion.h>
 #import <CoreLocation/CLLocationManager.h>
 #import <CoreLocation/CLLocationManagerDelegate.h>
@@ -39,6 +40,13 @@
   return (CLDeviceOrientation)[RCTConvert int:json];
 }
 
++ (CLLocationCoordinate2D)CLLocationCoordinate2D:(id)json
+{
+  NSDictionary<NSString *, id> *coordinate = [RCTConvert NSDictionary:json];
+
+  return CLLocationCoordinate2DMake([RCTConvert double:coordinate[@"latitude"]], [RCTConvert double:coordinate[@"longitude"]]);
+}
+
 + (CLRegion *)CLRegion:(id)json
 {
   return [RCTConvert CLCircularRegion:json];
@@ -47,14 +55,20 @@
 + (CLCircularRegion *)CLCircularRegion:(id)json
 {
   NSDictionary<NSString *, id> *region = [RCTConvert NSDictionary:json];
-  double radius = [RCTConvert double:region[@"radius"]];
-  CLLocationDegrees latitude = [RCTConvert double:region[@"latitude"]];
-  CLLocationDegrees longitude = [RCTConvert double:region[@"longitude"]];
-  CLLocationCoordinate2D center = CLLocationCoordinate2DMake(latitude, longitude);
 
-  return [[CLCircularRegion alloc] initWithCenter: center
-                                           radius: radius
+  return [[CLCircularRegion alloc] initWithCenter: [RCTConvert CLLocationCoordinate2D:region[@"center"]]
+                                           radius: [RCTConvert double:region[@"radius"]]
                                        identifier: region[@"identifier"]];
+}
+
++ (CLBeaconRegion *)CLBeaconRegion:(id)json
+{
+  NSDictionary<NSString *, id> *beacon = [RCTConvert NSDictionary:json];
+
+  return [[CLBeaconRegion alloc] initWithProximityUUID: beacon[@"proximityUUID"]
+                                                 major: [RCTConvert uint64_t:beacon[@"major"]]
+                                                 minor: [RCTConvert uint64_t:beacon[@"minor"]]
+                                            identifier: beacon[@"identifier"]];
 }
 
 @end
@@ -113,28 +127,28 @@ bool hasListeners;
        didFailWithError:(NSError *)error
 {
   if (!hasListeners) return;
-  [self sendEventWithName:@"didFailWithError" body:error];
+  [self sendEventWithName:@"didFailWithError" body:JSONError(error)];
 }
 
 - (void)locationManager:(CLLocationManager *)manager
        didUpdateHeading:(CLHeading *)newHeading
 {
   if (!hasListeners) return;
-  [self sendEventWithName:@"didUpdateHeading" body:newHeading];
+  [self sendEventWithName:@"didUpdateHeading" body: JSONHeading(newHeading)];
 }
 
 - (void)locationManager:(CLLocationManager *)manager
          didEnterRegion:(CLRegion *)region
 {
   if (!hasListeners) return;
-  [self sendEventWithName:@"didEnterRegion" body:region];
+  [self sendEventWithName:@"didEnterRegion" body:JSONRegion(region)];
 }
 
 - (void)locationManager:(CLLocationManager *)manager
           didExitRegion:(CLRegion *)region
 {
   if (!hasListeners) return;
-  [self sendEventWithName:@"didExitRegion" body:region];
+  [self sendEventWithName:@"didExitRegion" body:JSONRegion(region)];
 }
 
 - (void)locationManager:(CLLocationManager *)manager
@@ -142,7 +156,7 @@ monitoringDidFailForRegion:(CLRegion *)region
               withError:(NSError *)error
 {
   if (!hasListeners) return;
-  [self sendEventWithName:@"monitoringDidFailForRegion" body:@{@"region": region, @"error": error}];
+  [self sendEventWithName:@"monitoringDidFailForRegion" body:@{@"region": JSONRegion(region), @"error": JSONError(error)}];
 }
 
 - (void)locationManager:(CLLocationManager *)manager
@@ -150,7 +164,7 @@ monitoringDidFailForRegion:(CLRegion *)region
                inRegion:(CLBeaconRegion *)region
 {
   if (!hasListeners) return;
-  [self sendEventWithName:@"didRangeBeaconsInRegion" body:@{@"beacons": beacons, @"region": region}];
+  [self sendEventWithName:@"didRangeBeaconsInRegion" body:@{@"beacons": JSONBeaconArray(beacons), @"region": JSONRegion(region)}];
 }
 
 - (void)locationManager:(CLLocationManager *)manager
@@ -158,7 +172,7 @@ rangingBeaconsDidFailForRegion:(CLBeaconRegion *)region
               withError:(NSError *)error
 {
   if (!hasListeners) return;
-  [self sendEventWithName:@"rangingBeaconsDidFailForRegion" body:@{@"region": region, @"error": error}];
+  [self sendEventWithName:@"rangingBeaconsDidFailForRegion" body:@{@"region": JSONRegion(region), @"error": JSONError(error)}];
 }
 
 - (void)locationManager:(CLLocationManager *)manager
@@ -166,21 +180,21 @@ rangingBeaconsDidFailForRegion:(CLBeaconRegion *)region
               forRegion:(CLRegion *)region
 {
   if (!hasListeners) return;
-  [self sendEventWithName:@"didDetermineStateForRegion" body:@{@"state": @(state), @"region": region}];
+  [self sendEventWithName:@"didDetermineStateForRegion" body:@{@"state": @(state), @"region": JSONRegion(region)}];
 }
 
 - (void)locationManager:(CLLocationManager *)manager
                didVisit:(CLVisit *)visit
 {
   if (!hasListeners) return;
-  [self sendEventWithName:@"didVisit" body:visit];
+  [self sendEventWithName:@"didVisit" body:JSONVisit(visit)];
 }
 
 - (void)locationManager:(CLLocationManager *)manager
 didFinishDeferredUpdatesWithError:(NSError *)error
 {
   if (!hasListeners) return;
-  [self sendEventWithName:@"didFinishDeferredUpdatesWithError" body:error];
+  [self sendEventWithName:@"didFinishDeferredUpdatesWithError" body:JSONError(error)];
 }
 
 
@@ -231,7 +245,11 @@ RCT_EXPORT_MODULE();
            @"DeviceOrientationFaceDown": @(CLDeviceOrientationFaceDown),
            @"RegionStateUnknown": @(CLRegionStateUnknown),
            @"RegionStateInside": @(CLRegionStateInside),
-           @"RegionStateOutside": @(CLRegionStateOutside)
+           @"RegionStateOutside": @(CLRegionStateOutside),
+           @"ProximityUnknown": @(CLProximityUnknown),
+           @"ProximityImmediate": @(CLProximityImmediate),
+           @"ProximityNear": @(CLProximityNear),
+           @"ProximityFar": @(CLProximityFar),
            };
 }
 
@@ -499,22 +517,6 @@ RCT_EXPORT_METHOD(getHeading:(RCTPromiseResolveBlock)resolve
 
 #pragma mark - Converters
 
-static NSDictionary<NSString*, id> *JSONLocation(CLLocation *location)
-{
-  return @{
-           @"altitude": @(location.altitude),
-           @"horizontalAccuracy": @(location.horizontalAccuracy),
-           @"verticalAccuracy": @(location.verticalAccuracy),
-           @"speed": @(location.speed),
-           @"course": @(location.course),
-           @"timestamp": @([location.timestamp timeIntervalSince1970] * 1000), // ms
-           @"coordinate": @{
-               @"latitude": @(location.coordinate.latitude),
-               @"longitude": @(location.coordinate.longitude)
-               }
-           };
-}
-
 static NSArray<NSDictionary<NSString*, id>*> *JSONLocationArray(NSArray<CLLocation*> *locations)
 {
   NSMutableArray *arr = [[NSMutableArray alloc] initWithCapacity:locations.count];
@@ -525,24 +527,16 @@ static NSArray<NSDictionary<NSString*, id>*> *JSONLocationArray(NSArray<CLLocati
   return [arr copy];
 }
 
-static NSDictionary<NSString*, id> *JSONRegion(CLRegion *region)
-{
-  if ([region isKindOfClass:[CLCircularRegion class]]) {
-    return JSONCircularRegion((CLCircularRegion *) region);
-  }
-
-  return @{@"identifier": region.identifier};
-}
-
-static NSDictionary<NSString*, id> *JSONCircularRegion(CLCircularRegion *region)
+static NSDictionary<NSString*, id> *JSONLocation(CLLocation *location)
 {
   return @{
-           @"identifier": region.identifier,
-           @"radius": @(region.radius),
-           @"center": @{
-               @"latitude": @(region.center.latitude),
-               @"longitude": @(region.center.longitude)
-               }
+           @"altitude": @(location.altitude),
+           @"horizontalAccuracy": @(location.horizontalAccuracy),
+           @"verticalAccuracy": @(location.verticalAccuracy),
+           @"speed": @(location.speed),
+           @"course": @(location.course),
+           @"timestamp": @(JSONTimestamp(location.timestamp)),
+           @"coordinate": JSONCoordinate(location.coordinate)
            };
 }
 
@@ -556,17 +550,101 @@ static NSArray<NSDictionary<NSString*, id>*> *JSONRegionArray(NSSet<__kindof CLR
   return [arr copy];
 }
 
+static NSDictionary<NSString*, id> *JSONRegion(CLRegion *region)
+{
+  if ([region isKindOfClass:[CLCircularRegion class]]) {
+    return JSONCircularRegion((CLCircularRegion *) region);
+  } else if ([region isKindOfClass:[CLBeaconRegion class]]) {
+    return JSONBeaconRegion((CLBeaconRegion *) region);
+  }
+
+  return @{@"identifier": region.identifier};
+}
+
+static NSDictionary<NSString*, id> *JSONCircularRegion(CLCircularRegion *region)
+{
+  return @{
+           @"identifier": region.identifier,
+           @"radius": @(region.radius),
+           @"center": JSONCoordinate(region.center)
+           };
+}
+
+static NSDictionary<NSString*, id> *JSONBeaconRegion(CLBeaconRegion *region)
+{
+  return @{
+           @"identifier": region.identifier,
+           @"proximityUUID": region.proximityUUID,
+           @"major": region.major,
+           @"minor": region.minor
+           };
+}
+
+static NSArray<NSDictionary<NSString*, id>*> *JSONBeaconArray(NSArray<CLBeacon *> *beacons)
+{
+  NSMutableArray *arr = [[NSMutableArray alloc] initWithCapacity:beacons.count];
+  for (CLBeacon *beacon in beacons) {
+    [arr addObject:JSONBeacon(beacon)];
+  }
+
+  return [arr copy];
+}
+
+static NSDictionary<NSString*, id> *JSONBeacon(CLBeacon *beacon)
+{
+  return @{
+           @"proximityUUID": beacon.proximityUUID,
+           @"major": beacon.major,
+           @"minor": beacon.minor,
+           @"proximity": @(beacon.proximity),
+           @"accuracy": @(beacon.accuracy),
+           @"rssi": @(beacon.rssi)
+           };
+}
+
+static NSDictionary<NSString*, id> *JSONVisit(CLVisit *visit)
+{
+  return @{
+           @"horizontalAccuracy": @(visit.horizontalAccuracy),
+           @"arrivalDate": @(JSONTimestamp(visit.arrivalDate)),
+           @"departureDate": @(JSONTimestamp(visit.departureDate)),
+           @"coordinate": JSONCoordinate(visit.coordinate)
+           };
+}
+
 static NSDictionary<NSString*, id> *JSONHeading(CLHeading *heading)
 {
   return @{
            @"magneticHeading": @(heading.magneticHeading),
            @"trueHeading": @(heading.trueHeading),
            @"headingAccuracy": @(heading.headingAccuracy),
-           @"timestamp": @([heading.timestamp timeIntervalSince1970] * 1000), // ms
+           @"timestamp": @(JSONTimestamp(heading.timestamp)),
            @"x": @(heading.x),
            @"y": @(heading.y),
-           @"z": @(heading.z),
+           @"z": @(heading.z)
            };
+}
+
+static NSDictionary<NSString*, id> *JSONError(NSError *error)
+{
+  return @{
+           @"code": @(error.code),
+           @"domain": error.domain,
+           @"userInfo": error.userInfo
+           };
+}
+
+static NSDictionary<NSString*, id> *JSONCoordinate(CLLocationCoordinate2D coordinate)
+{
+  return @{
+           @"latitude": @(coordinate.latitude),
+           @"longitude": @(coordinate.longitude)
+           };
+}
+
+static double JSONTimestamp(NSDate *date)
+{
+  return [date timeIntervalSince1970] * 1000; // ms
 }
 
 @end
