@@ -1,0 +1,21 @@
+{
+  "name": "react-native-location-manager-ios",
+  "description": "React Native Location Manager Bridge for iOS",
+  "author": "Daniel Rosa <daniel.rosa@tecnico.ulisboa.pt>",
+  "version": "1.0.0",
+  "license": "MIT",
+  "main": "index.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/djhr/react-native-location-manager-ios"
+  },
+  "keywords": [
+    "react-native-location-manager-ios",
+    "react-native-location-manager",
+    "react",
+    "react-native",
+    "location",
+    "manager",
+    "bridge"
+  ]
+}
