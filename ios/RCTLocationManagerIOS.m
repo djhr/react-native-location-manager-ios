@@ -18,8 +18,8 @@
 {
   NSDictionary<NSString *, id> *region = [RCTConvert NSDictionary:json];
   double radius = [RCTConvert double:region[@"radius"]];
-  CLLocationDegrees latitude = [RCTConvert double:region[@"radius"]];
-  CLLocationDegrees longitude = [RCTConvert double:region[@"radius"]];
+  CLLocationDegrees latitude = [RCTConvert double:region[@"latitude"]];
+  CLLocationDegrees longitude = [RCTConvert double:region[@"longitude"]];
   CLLocationCoordinate2D center = CLLocationCoordinate2DMake(latitude, longitude);
 
   return [[CLCircularRegion alloc] initWithCenter: center
