@@ -10,6 +10,7 @@
 #import <CoreLocation/CLLocationManagerDelegate.h>
 #import <CoreLocation/CLLocationManager+CLVisitExtensions.h>
 
+#import <React/RCTLog.h>
 #import <React/RCTConvert.h>
 
 
@@ -359,9 +360,23 @@ RCT_EXPORT_METHOD(startMonitoringForRegion:(CLRegion *) region)
   [locationManager startMonitoringForRegion: region];
 }
 
-RCT_EXPORT_METHOD(stopMonitoringForRegion:(CLRegion *) region)
+RCT_EXPORT_METHOD(stopMonitoringForRegion:(NSString *) identifier)
 {
-  [locationManager stopMonitoringForRegion: region];
+  for (CLRegion *region in [locationManager monitoredRegions]) {
+    if ([region.identifier isEqualToString:identifier]) {
+      [locationManager stopMonitoringForRegion: region];
+      return;
+    }
+  }
+  
+  RCTLogWarn(@"Couldn't find region '%@' in monitoredRegions", identifier);
+}
+
+RCT_EXPORT_METHOD(stopMonitoringForAllRegions)
+{
+  for (CLRegion *region in [locationManager monitoredRegions]) {
+    [locationManager stopMonitoringForRegion: region];
+  }
 }
 
 RCT_EXPORT_METHOD(startRangingBeaconsInRegion:(CLBeaconRegion *) region)
@@ -369,9 +384,23 @@ RCT_EXPORT_METHOD(startRangingBeaconsInRegion:(CLBeaconRegion *) region)
   [locationManager startRangingBeaconsInRegion: region];
 }
 
-RCT_EXPORT_METHOD(stopRangingBeaconsInRegion:(CLBeaconRegion *) region)
+RCT_EXPORT_METHOD(stopRangingBeaconsInRegion:(NSString *) identifier)
 {
-  [locationManager stopRangingBeaconsInRegion: region];
+  for (CLBeaconRegion *region in [locationManager rangedRegions]) {
+    if ([region.identifier isEqualToString:identifier]) {
+      [locationManager stopRangingBeaconsInRegion: region];
+      return;
+    }
+  }
+  
+  RCTLogWarn(@"Couldn't find region '%@' in rangedRegions", identifier);
+}
+
+RCT_EXPORT_METHOD(stopRangingBeaconsInAllRegions)
+{
+  for (CLBeaconRegion *region in [locationManager rangedRegions]) {
+    [locationManager stopRangingBeaconsInRegion: region];
+  }
 }
 
 RCT_EXPORT_METHOD(requestStateForRegion:(CLRegion *) region)
