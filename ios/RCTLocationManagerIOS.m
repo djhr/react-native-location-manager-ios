@@ -260,6 +260,24 @@ RCT_EXPORT_MODULE();
            @"ProximityImmediate": @(CLProximityImmediate),
            @"ProximityNear": @(CLProximityNear),
            @"ProximityFar": @(CLProximityFar),
+           @"ErrorLocationUnknown": @(kCLErrorLocationUnknown),
+           @"ErrorDenied": @(kCLErrorDenied),
+           @"ErrorNetwork": @(kCLErrorNetwork),
+           @"ErrorHeadingFailure": @(kCLErrorHeadingFailure),
+           @"ErrorRegionMonitoringDenied": @(kCLErrorRegionMonitoringDenied),
+           @"ErrorRegionMonitoringFailure": @(kCLErrorRegionMonitoringFailure),
+           @"ErrorRegionMonitoringSetupDelayed": @(kCLErrorRegionMonitoringSetupDelayed),
+           @"ErrorRegionMonitoringResponseDelayed": @(kCLErrorRegionMonitoringResponseDelayed),
+           @"ErrorGeocodeFoundNoResult": @(kCLErrorGeocodeFoundNoResult),
+           @"ErrorGeocodeFoundPartialResult": @(kCLErrorGeocodeFoundPartialResult),
+           @"ErrorGeocodeCanceled": @(kCLErrorGeocodeCanceled),
+           @"ErrorDeferredFailed": @(kCLErrorDeferredFailed),
+           @"ErrorDeferredNotUpdatingLocation": @(kCLErrorDeferredNotUpdatingLocation),
+           @"ErrorDeferredAccuracyTooLow": @(kCLErrorDeferredAccuracyTooLow),
+           @"ErrorDeferredDistanceFiltered": @(kCLErrorDeferredDistanceFiltered),
+           @"ErrorDeferredCanceled": @(kCLErrorDeferredCanceled),
+           @"ErrorRangingUnavailable": @(kCLErrorRangingUnavailable),
+           @"ErrorRangingFailure": @(kCLErrorRangingFailure)
            };
 }
 
@@ -368,7 +386,7 @@ RCT_EXPORT_METHOD(stopMonitoringForRegion:(NSString *) identifier)
       return;
     }
   }
-  
+
   RCTLogWarn(@"Couldn't find region '%@' in monitoredRegions", identifier);
 }
 
@@ -392,7 +410,7 @@ RCT_EXPORT_METHOD(stopRangingBeaconsInRegion:(NSString *) identifier)
       return;
     }
   }
-  
+
   RCTLogWarn(@"Couldn't find region '%@' in rangedRegions", identifier);
 }
 
@@ -667,8 +685,7 @@ static NSDictionary<NSString*, id> *JSONError(NSError *error)
 {
   return @{
            @"code": @(error.code),
-           @"domain": error.domain,
-           @"userInfo": error.userInfo
+           @"domain": error.domain
            };
 }
 

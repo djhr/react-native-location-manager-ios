@@ -70,6 +70,27 @@ export default class LocationManagerIOS {
         Far: NativeModule.ProximityFar,
     };
 
+    static Error = {
+        LocationUnknown: NativeModule.ErrorLocationUnknown,
+        Denied: NativeModule.ErrorDenied,
+        Network: NativeModule.ErrorNetwork,
+        HeadingFailure: NativeModule.ErrorHeadingFailure,
+        RegionMonitoringDenied: NativeModule.ErrorRegionMonitoringDenied,
+        RegionMonitoringFailure: NativeModule.ErrorRegionMonitoringFailure,
+        RegionMonitoringSetupDelayed: NativeModule.ErrorRegionMonitoringSetupDelayed,
+        RegionMonitoringResponseDelayed: NativeModule.ErrorRegionMonitoringResponseDelayed,
+        GeocodeFoundNoResult: NativeModule.ErrorGeocodeFoundNoResult,
+        GeocodeFoundPartialResult: NativeModule.ErrorGeocodeFoundPartialResult,
+        GeocodeCanceled: NativeModule.ErrorGeocodeCanceled,
+        DeferredFailed: NativeModule.ErrorDeferredFailed,
+        DeferredNotUpdatingLocation: NativeModule.ErrorDeferredNotUpdatingLocation,
+        DeferredAccuracyTooLow: NativeModule.ErrorDeferredAccuracyTooLow,
+        DeferredDistanceFiltered: NativeModule.ErrorDeferredDistanceFiltered,
+        DeferredCanceled: NativeModule.ErrorDeferredCanceled,
+        RangingUnavailable: NativeModule.ErrorRangingUnavailable,
+        RangingFailure: NativeModule.ErrorRangingFailure,
+    };
+
 
     // getters & setters
 
