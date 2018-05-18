@@ -1,5 +1,9 @@
 import { NativeModules, NativeEventEmitter } from 'react-native';
 
+const NativeModule = NativeModules.LocationManagerIOS;
+
+const Emitter = new NativeEventEmitter(NativeModule);
+
 export default class LocationManagerIOS {
 
     static Events = {
@@ -322,8 +326,3 @@ class CLFactory {
         return { identifier, proximityUUID, major, minor };
     }
 }
-
-
-const NativeModule = NativeModules.LocationManagerIOS;
-
-const Emitter = new NativeEventEmitter(NativeModule);
