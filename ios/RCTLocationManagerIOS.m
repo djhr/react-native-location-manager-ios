@@ -57,28 +57,50 @@
 {
   NSDictionary<NSString *, id> *region = [RCTConvert NSDictionary:json];
 
-  return [[CLCircularRegion alloc] initWithCenter: [RCTConvert CLLocationCoordinate2D:region[@"center"]]
-                                           radius: [RCTConvert double:region[@"radius"]]
-                                       identifier: region[@"identifier"]];
+  CLCircularRegion *region = [[CLCircularRegion alloc] initWithCenter: [RCTConvert CLLocationCoordinate2D:region[@"center"]]
+                                                               radius: [RCTConvert double:region[@"radius"]]
+                                                           identifier: region[@"identifier"]];
+  
+  if (region[@"notifyOnEntry"] != NULL) {
+    region.notifyOnEntry = [RCTConvert BOOL:region[@"notifyOnEntry"]];
+  }
+  
+  if (region[@"notifyOnExit"] != NULL) {
+    region.notifyOnExit = [RCTConvert BOOL:region[@"notifyOnExit"]];
+  }
+  
+  return region;
 }
 
 + (CLBeaconRegion *)CLBeaconRegion:(id)json
 {
   NSDictionary<NSString *, id> *beacon = [RCTConvert NSDictionary:json];
-
+  CLBeaconRegion *region;
+  
+  
   if (beacon[@"major"] == NULL && beacon[@"minor"] == NULL) {
-    return [[CLBeaconRegion alloc] initWithProximityUUID: beacon[@"proximityUUID"]
-                                              identifier: beacon[@"identifier"]];
+    region = [[CLBeaconRegion alloc] initWithProximityUUID: beacon[@"proximityUUID"]
+                                                identifier: beacon[@"identifier"]];
   } else if (beacon[@"major"] != NULL && beacon[@"minor"] == NULL) {
-    return [[CLBeaconRegion alloc] initWithProximityUUID: beacon[@"proximityUUID"]
-                                                   major: [RCTConvert uint64_t:beacon[@"major"]]
-                                              identifier: beacon[@"identifier"]];
+    region = [[CLBeaconRegion alloc] initWithProximityUUID: beacon[@"proximityUUID"]
+                                                     major: [RCTConvert uint64_t:beacon[@"major"]]
+                                                identifier: beacon[@"identifier"]];
   } else {
-    return [[CLBeaconRegion alloc] initWithProximityUUID: beacon[@"proximityUUID"]
-                                                   major: [RCTConvert uint64_t:beacon[@"major"]]
-                                                   minor: [RCTConvert uint64_t:beacon[@"minor"]]
-                                              identifier: beacon[@"identifier"]];
+    region = [[CLBeaconRegion alloc] initWithProximityUUID: beacon[@"proximityUUID"]
+                                                     major: [RCTConvert uint64_t:beacon[@"major"]]
+                                                     minor: [RCTConvert uint64_t:beacon[@"minor"]]
+                                                identifier: beacon[@"identifier"]];
   }
+  
+  if (region[@"notifyOnEntry"] != NULL) {
+    region.notifyOnEntry = [RCTConvert BOOL:region[@"notifyOnEntry"]];
+  }
+  
+  if (region[@"notifyOnExit"] != NULL) {
+    region.notifyOnExit = [RCTConvert BOOL:region[@"notifyOnExit"]];
+  }
+  
+  return region;
 }
 
 @end
@@ -614,7 +636,11 @@ static NSDictionary<NSString*, id> *JSONRegion(CLRegion *region)
     return JSONBeaconRegion((CLBeaconRegion *) region);
   }
 
-  return @{@"identifier": region.identifier};
+  return @{
+           @"identifier": region.identifier
+           @"notifyOnEntry": region.notifyOnEntry,
+           @"notifyOnExit": region.notifyOnExit
+           };
 }
 
 static NSDictionary<NSString*, id> *JSONCircularRegion(CLCircularRegion *region)
@@ -622,7 +648,9 @@ static NSDictionary<NSString*, id> *JSONCircularRegion(CLCircularRegion *region)
   return @{
            @"identifier": region.identifier,
            @"radius": @(region.radius),
-           @"center": JSONCoordinate(region.center)
+           @"center": JSONCoordinate(region.center),
+           @"notifyOnEntry": region.notifyOnEntry,
+           @"notifyOnExit": region.notifyOnExit
            };
 }
 
@@ -632,7 +660,9 @@ static NSDictionary<NSString*, id> *JSONBeaconRegion(CLBeaconRegion *region)
            @"identifier": region.identifier,
            @"proximityUUID": region.proximityUUID,
            @"major": region.major,
-           @"minor": region.minor
+           @"minor": region.minor,
+           @"notifyOnEntry": region.notifyOnEntry,
+           @"notifyOnExit": region.notifyOnExit
            };
 }
 

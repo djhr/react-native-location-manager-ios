@@ -264,9 +264,9 @@ export default class LocationManagerIOS {
         NativeModule.dismissHeadingCalibrationDisplay();
     }
 
-    static startMonitoringForRegion(identifier, latitude, longitude, radius) {
+    static startMonitoringForRegion(identifier, latitude, longitude, radius, notifyOnEntry, notifyOnExit) {
         const center = CLFactory.makeCoordinate(latitude, longitude);
-        const region = CLFactory.makeCircularRegion(identifier, center, radius);
+        const region = CLFactory.makeCircularRegion(identifier, center, radius, notifyOnEntry, notifyOnExit);
 
         NativeModule.startMonitoringForRegion(region);
     }
@@ -281,8 +281,8 @@ export default class LocationManagerIOS {
         NativeModule.stopMonitoringForAllRegions();
     }
 
-    static startRangingBeaconsInRegion(identifier, proximityUUID, major, minor) {
-        const region = CLFactory.makeBeaconRegion(identifier, proximityUUID, major, minor);
+    static startRangingBeaconsInRegion(identifier, proximityUUID, major, minor, notifyOnEntry, notifyOnExit) {
+        const region = CLFactory.makeBeaconRegion(identifier, proximityUUID, major, minor, notifyOnEntry, notifyOnExit);
 
         NativeModule.startRangingBeaconsInRegion(region);
     }
@@ -333,17 +333,17 @@ class CLFactory {
         return { latitude, longitude };
     }
 
-    static makeCircularRegion(identifier, center, radius) {
+    static makeCircularRegion(identifier, center, radius, notifyOnEntry, notifyOnExit) {
         if (typeof(identifier) !== 'string') throw new TypeError('Invalid identifier');
         if (typeof(radius) !== 'number') throw new TypeError('Invalid radius');
 
-        return { identifier, radius, center };
+        return { identifier, radius, center, notifyOnEntry, notifyOnExit };
     }
 
-    static makeBeaconRegion(identifier, proximityUUID, major, minor) {
+    static makeBeaconRegion(identifier, proximityUUID, major, minor, notifyOnEntry, notifyOnExit) {
         if (typeof(identifier) !== 'string') throw new TypeError('Invalid identifier');
         if (typeof(proximityUUID) !== 'string') throw new TypeError('Invalid proximityUUID');
 
-        return { identifier, proximityUUID, major, minor };
+        return { identifier, proximityUUID, major, minor, notifyOnEntry, notifyOnExit };
     }
 }
