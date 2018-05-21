@@ -55,51 +55,51 @@
 
 + (CLCircularRegion *)CLCircularRegion:(id)json
 {
-  NSDictionary<NSString *, id> *region = [RCTConvert NSDictionary:json];
+  NSDictionary<NSString *, id> *options = [RCTConvert NSDictionary:json];
 
-  CLCircularRegion *region = [[CLCircularRegion alloc] initWithCenter: [RCTConvert CLLocationCoordinate2D:region[@"center"]]
-                                                               radius: [RCTConvert double:region[@"radius"]]
-                                                           identifier: region[@"identifier"]];
-  
-  if (region[@"notifyOnEntry"] != NULL) {
-    region.notifyOnEntry = [RCTConvert BOOL:region[@"notifyOnEntry"]];
+  CLCircularRegion *region = [[CLCircularRegion alloc] initWithCenter: [RCTConvert CLLocationCoordinate2D:options[@"center"]]
+                                                               radius: [RCTConvert double:options[@"radius"]]
+                                                           identifier: options[@"identifier"]];
+
+  if (options[@"notifyOnEntry"] != NULL) {
+    region.notifyOnEntry = [RCTConvert BOOL:options[@"notifyOnEntry"]];
   }
-  
-  if (region[@"notifyOnExit"] != NULL) {
-    region.notifyOnExit = [RCTConvert BOOL:region[@"notifyOnExit"]];
+
+  if (options[@"notifyOnExit"] != NULL) {
+    region.notifyOnExit = [RCTConvert BOOL:options[@"notifyOnExit"]];
   }
-  
+
   return region;
 }
 
 + (CLBeaconRegion *)CLBeaconRegion:(id)json
 {
-  NSDictionary<NSString *, id> *beacon = [RCTConvert NSDictionary:json];
+  NSDictionary<NSString *, id> *options = [RCTConvert NSDictionary:json];
   CLBeaconRegion *region;
-  
-  
-  if (beacon[@"major"] == NULL && beacon[@"minor"] == NULL) {
-    region = [[CLBeaconRegion alloc] initWithProximityUUID: beacon[@"proximityUUID"]
-                                                identifier: beacon[@"identifier"]];
-  } else if (beacon[@"major"] != NULL && beacon[@"minor"] == NULL) {
-    region = [[CLBeaconRegion alloc] initWithProximityUUID: beacon[@"proximityUUID"]
-                                                     major: [RCTConvert uint64_t:beacon[@"major"]]
-                                                identifier: beacon[@"identifier"]];
+
+
+  if (options[@"major"] == NULL && options[@"minor"] == NULL) {
+    region = [[CLBeaconRegion alloc] initWithProximityUUID: options[@"proximityUUID"]
+                                                identifier: options[@"identifier"]];
+  } else if (options[@"major"] != NULL && options[@"minor"] == NULL) {
+    region = [[CLBeaconRegion alloc] initWithProximityUUID: options[@"proximityUUID"]
+                                                     major: [RCTConvert uint64_t:options[@"major"]]
+                                                identifier: options[@"identifier"]];
   } else {
-    region = [[CLBeaconRegion alloc] initWithProximityUUID: beacon[@"proximityUUID"]
-                                                     major: [RCTConvert uint64_t:beacon[@"major"]]
-                                                     minor: [RCTConvert uint64_t:beacon[@"minor"]]
-                                                identifier: beacon[@"identifier"]];
+    region = [[CLBeaconRegion alloc] initWithProximityUUID: options[@"proximityUUID"]
+                                                     major: [RCTConvert uint64_t:options[@"major"]]
+                                                     minor: [RCTConvert uint64_t:options[@"minor"]]
+                                                identifier: options[@"identifier"]];
   }
-  
-  if (region[@"notifyOnEntry"] != NULL) {
-    region.notifyOnEntry = [RCTConvert BOOL:region[@"notifyOnEntry"]];
+
+  if (options[@"notifyOnEntry"] != NULL) {
+    region.notifyOnEntry = [RCTConvert BOOL:options[@"notifyOnEntry"]];
   }
-  
-  if (region[@"notifyOnExit"] != NULL) {
-    region.notifyOnExit = [RCTConvert BOOL:region[@"notifyOnExit"]];
+
+  if (options[@"notifyOnExit"] != NULL) {
+    region.notifyOnExit = [RCTConvert BOOL:options[@"notifyOnExit"]];
   }
-  
+
   return region;
 }
 
@@ -637,9 +637,9 @@ static NSDictionary<NSString*, id> *JSONRegion(CLRegion *region)
   }
 
   return @{
-           @"identifier": region.identifier
-           @"notifyOnEntry": region.notifyOnEntry,
-           @"notifyOnExit": region.notifyOnExit
+           @"identifier": region.identifier,
+           @"notifyOnEntry": @(region.notifyOnEntry),
+           @"notifyOnExit": @(region.notifyOnExit)
            };
 }
 
@@ -649,8 +649,8 @@ static NSDictionary<NSString*, id> *JSONCircularRegion(CLCircularRegion *region)
            @"identifier": region.identifier,
            @"radius": @(region.radius),
            @"center": JSONCoordinate(region.center),
-           @"notifyOnEntry": region.notifyOnEntry,
-           @"notifyOnExit": region.notifyOnExit
+           @"notifyOnEntry": @(region.notifyOnEntry),
+           @"notifyOnExit": @(region.notifyOnExit)
            };
 }
 
@@ -661,8 +661,8 @@ static NSDictionary<NSString*, id> *JSONBeaconRegion(CLBeaconRegion *region)
            @"proximityUUID": region.proximityUUID,
            @"major": region.major,
            @"minor": region.minor,
-           @"notifyOnEntry": region.notifyOnEntry,
-           @"notifyOnExit": region.notifyOnExit
+           @"notifyOnEntry": @(region.notifyOnEntry),
+           @"notifyOnExit": @(region.notifyOnExit)
            };
 }
 
