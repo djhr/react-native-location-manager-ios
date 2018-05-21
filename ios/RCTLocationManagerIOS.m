@@ -443,9 +443,16 @@ RCT_EXPORT_METHOD(stopRangingBeaconsInAllRegions)
   }
 }
 
-RCT_EXPORT_METHOD(requestStateForRegion:(CLRegion *) region)
+RCT_EXPORT_METHOD(requestStateForRegion:(NSString *) identifier)
 {
-  [locationManager requestStateForRegion: region];
+  for (CLRegion *region in [locationManager monitoredRegions]) {
+    if ([region.identifier isEqualToString:identifier]) {
+      [locationManager requestStateForRegion: region];
+      return;
+    }
+  }
+
+  RCTLogWarn(@"Couldn't find region '%@' in monitoredRegions", identifier);
 }
 
 RCT_EXPORT_METHOD(startMonitoringVisits)
