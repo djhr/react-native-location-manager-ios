@@ -40,6 +40,10 @@ export default class LocationManagerIOS {
         ThreeKilometers: NativeModule.LocationAccuracyThreeKilometers,
     };
 
+    static DistanceFilter = {
+        None: NativeModule.DistanceFilterNone,
+    };
+
     static ActivityType = {
         Other: NativeModule.ActivityTypeOther,
         AutomotiveNavigation: NativeModule.ActivityTypeAutomotiveNavigation,
@@ -176,6 +180,10 @@ export default class LocationManagerIOS {
 
     static get monitoredRegions() {
         return NativeModule.getMonitoredRegions();
+    }
+
+    static get gpsMonitoredRegions() {
+        return NativeModule.getGPSMonitoredRegions();
     }
 
     static get rangedRegions() {
