@@ -9,15 +9,19 @@ export default class LocationManagerIOS {
     static Events = {
         didUpdateLocations: 'didUpdateLocations',
         didFailWithError: 'didFailWithError',
+        didFinishDeferredUpdatesWithError: 'didFinishDeferredUpdatesWithError',
+        didPauseLocationUpdates: 'didPauseLocationUpdates',
+        didResumeLocationUpdates: 'didResumeLocationUpdates',
         didUpdateHeading: 'didUpdateHeading',
         didEnterRegion: 'didEnterRegion',
         didExitRegion: 'didExitRegion',
-        didVisit: 'didVisit',
+        didDetermineStateForRegion: 'didDetermineStateForRegion',
         monitoringDidFailForRegion: 'monitoringDidFailForRegion',
+        didStartMonitoringForRegion: 'didStartMonitoringForRegion',
         didRangeBeaconsInRegion: 'didRangeBeaconsInRegion',
         rangingBeaconsDidFailForRegion: 'rangingBeaconsDidFailForRegion',
-        didDetermineStateForRegion: 'didDetermineStateForRegion',
-        didFinishDeferredUpdatesWithError: 'didFinishDeferredUpdatesWithError',
+        didVisit: 'didVisit',
+        didChangeAuthorizationStatus: 'didChangeAuthorizationStatus',
     };
 
 

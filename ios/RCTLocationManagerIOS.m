@@ -278,6 +278,25 @@ bool hasListeners;
 }
 
 - (void)locationManager:(CLLocationManager *)manager
+didFinishDeferredUpdatesWithError:(NSError *)error
+{
+  if (!hasListeners) return;
+  [self sendEventWithName:@"didFinishDeferredUpdatesWithError" body:JSONError(error)];
+}
+
+- (void)locationManagerDidPauseLocationUpdates:(CLLocationManager *)manager
+{
+  if (!hasListeners) return;
+  [self sendEventWithName:@"didPauseLocationUpdates" body:nil];
+}
+
+- (void)locationManagerDidResumeLocationUpdates:(CLLocationManager *)manager
+{
+  if (!hasListeners) return;
+  [self sendEventWithName:@"didResumeLocationUpdates" body:nil];
+}
+
+- (void)locationManager:(CLLocationManager *)manager
        didUpdateHeading:(CLHeading *)newHeading
 {
   if (!hasListeners) return;
@@ -299,11 +318,26 @@ bool hasListeners;
 }
 
 - (void)locationManager:(CLLocationManager *)manager
+      didDetermineState:(CLRegionState)state
+              forRegion:(CLRegion *)region
+{
+  if (!hasListeners) return;
+  [self sendEventWithName:@"didDetermineStateForRegion" body:@{@"state": @(state), @"region": JSONRegion(region)}];
+}
+
+- (void)locationManager:(CLLocationManager *)manager
 monitoringDidFailForRegion:(CLRegion *)region
               withError:(NSError *)error
 {
   if (!hasListeners) return;
   [self sendEventWithName:@"monitoringDidFailForRegion" body:@{@"region": JSONRegion(region), @"error": JSONError(error)}];
+}
+
+- (void)locationManager:(CLLocationManager *)manager
+didStartMonitoringForRegion:(CLRegion *)region
+{
+  if (!hasListeners) return;
+  [self sendEventWithName:@"didStartMonitoringForRegion" body:JSONRegion(region)];
 }
 
 - (void)locationManager:(CLLocationManager *)manager
@@ -323,14 +357,6 @@ rangingBeaconsDidFailForRegion:(CLBeaconRegion *)region
 }
 
 - (void)locationManager:(CLLocationManager *)manager
-      didDetermineState:(CLRegionState)state
-              forRegion:(CLRegion *)region
-{
-  if (!hasListeners) return;
-  [self sendEventWithName:@"didDetermineStateForRegion" body:@{@"state": @(state), @"region": JSONRegion(region)}];
-}
-
-- (void)locationManager:(CLLocationManager *)manager
                didVisit:(CLVisit *)visit
 {
   if (!hasListeners) return;
@@ -338,10 +364,10 @@ rangingBeaconsDidFailForRegion:(CLBeaconRegion *)region
 }
 
 - (void)locationManager:(CLLocationManager *)manager
-didFinishDeferredUpdatesWithError:(NSError *)error
+didChangeAuthorizationStatus:(CLAuthorizationStatus)status
 {
   if (!hasListeners) return;
-  [self sendEventWithName:@"didFinishDeferredUpdatesWithError" body:JSONError(error)];
+  [self sendEventWithName:@"didChangeAuthorizationStatus" body:@(state)];
 }
 
 
@@ -358,15 +384,19 @@ RCT_EXPORT_MODULE();
 {
   return @[@"didUpdateLocations",
            @"didFailWithError",
+           @"didFinishDeferredUpdatesWithError",
+           @"didPauseLocationUpdates",
+           @"didResumeLocationUpdates",
            @"didUpdateHeading",
            @"didEnterRegion",
            @"didExitRegion",
+           @"didDetermineStateForRegion",
            @"monitoringDidFailForRegion",
+           @"didStartMonitoringForRegion",
            @"didRangeBeaconsInRegion",
            @"rangingBeaconsDidFailForRegion",
-           @"didDetermineStateForRegion",
            @"didVisit",
-           @"didFinishDeferredUpdatesWithError"];
+           @"didChangeAuthorizationStatus"];
 }
 
 - (NSDictionary *)constantsToExport
