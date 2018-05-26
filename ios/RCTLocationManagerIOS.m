@@ -367,7 +367,7 @@ rangingBeaconsDidFailForRegion:(CLBeaconRegion *)region
 didChangeAuthorizationStatus:(CLAuthorizationStatus)status
 {
   if (!hasListeners) return;
-  [self sendEventWithName:@"didChangeAuthorizationStatus" body:@(state)];
+  [self sendEventWithName:@"didChangeAuthorizationStatus" body:@(status)];
 }
 
 
