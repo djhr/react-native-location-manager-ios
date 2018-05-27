@@ -255,6 +255,9 @@ bool hasListeners;
       [self setState:CLRegionStateOutside forGPSRegion:region];
       if (region.notifyOnExit) [self locationManager:locationManager didExitRegion:region];
     }
+
+    CLRegionState newState = [self stateForGPSRegion:region];
+    if (state != newState) [self locationManager:locationManager didDetermineState:newState forRegion:region];
   }
 
   [self snapshot];
