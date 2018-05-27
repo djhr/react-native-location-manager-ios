@@ -844,7 +844,7 @@ static NSDictionary<NSString*, id> *JSONLocation(CLLocation *location)
            @"verticalAccuracy": @(location.verticalAccuracy),
            @"speed": @(location.speed),
            @"course": @(location.course),
-           @"timestamp": @(JSONTimestamp(location.timestamp)),
+           @"timestamp": JSONTimestamp(location.timestamp),
            @"coordinate": JSONCoordinate(location.coordinate)
            };
 }
@@ -923,8 +923,8 @@ static NSDictionary<NSString*, id> *JSONVisit(CLVisit *visit)
 {
   return @{
            @"horizontalAccuracy": @(visit.horizontalAccuracy),
-           @"arrivalDate": @(JSONTimestamp(visit.arrivalDate)),
-           @"departureDate": @(JSONTimestamp(visit.departureDate)),
+           @"arrivalDate": JSONTimestamp(visit.arrivalDate),
+           @"departureDate": JSONTimestamp(visit.departureDate),
            @"coordinate": JSONCoordinate(visit.coordinate)
            };
 }
@@ -935,7 +935,7 @@ static NSDictionary<NSString*, id> *JSONHeading(CLHeading *heading)
            @"magneticHeading": @(heading.magneticHeading),
            @"trueHeading": @(heading.trueHeading),
            @"headingAccuracy": @(heading.headingAccuracy),
-           @"timestamp": @(JSONTimestamp(heading.timestamp)),
+           @"timestamp": JSONTimestamp(heading.timestamp),
            @"x": @(heading.x),
            @"y": @(heading.y),
            @"z": @(heading.z)
@@ -958,9 +958,14 @@ static NSDictionary<NSString*, id> *JSONCoordinate(CLLocationCoordinate2D coordi
            };
 }
 
-static double JSONTimestamp(NSDate *date)
+static id JSONTimestamp(NSDate *date)
 {
-  return [date timeIntervalSince1970] * 1000; // ms
+  return isDistant(date) ? nil : @([date timeIntervalSince1970] * 1000); // ms
+}
+
+static BOOL isDistant(NSDate *date)
+{
+  return [date isEqualToDate:NSDate.distantPast] || [date isEqualToDate:NSDate.distantFuture];
 }
 
 @end
