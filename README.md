@@ -1,6 +1,8 @@
 # react-native-location-manager-ios
 React Native Location Manager Bridge for iOS
 
+This module is intended for advanced usage, if you only need basic geolocation functionality you will be better with [React Native Geolocation](https://facebook.github.io/react-native/docs/geolocation.html) module.
+
 ## Installation
 `yarn add react-native-location-manager-ios`
 
