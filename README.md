@@ -63,7 +63,7 @@ See [`CLLocationManagerDelegate`](https://developer.apple.com/documentation/core
 | [`didChangeAuthorizationStatus`](https://developer.apple.com/documentation/corelocation/cllocationmanagerdelegate/1423701-locationmanager) | `status: AuthorizationStatus` |
 
 
-### Enumerations
+### Enums
 
 ```js
 LocationManagerIOS.addListener(LocationManagerIOS.Events.didFailWithError, (err) => {
@@ -73,7 +73,7 @@ LocationManagerIOS.addListener(LocationManagerIOS.Events.didFailWithError, (err)
 });
 ```
 
-| Enumeration | Values
+| Enum | Values
 |---|---|
 | [`AuthorizationStatus`](https://developer.apple.com/documentation/corelocation/clauthorizationstatus) | `NotDetermined`, `Restricted`, `Denied`, `AuthorizedAlways`, `AuthorizedWhenInUse`
 | [`LocationAccuracy`](https://developer.apple.com/documentation/corelocation/cllocationaccuracy) | `BestForNavigation`, `Best`, `NearestTenMeters`, `HundredMeters`, `Kilometer`, `ThreeKilometers`
@@ -132,7 +132,7 @@ See [`CLLocationManager`](https://developer.apple.com/documentation/corelocation
 | Method | Arguments | Return | Notes
 |---|---|---|---|
 | `addListener` | `event: string`, `listener: function` | `{ remove: function }` | `custom`
-| [`authorizationStatus`](https://developer.apple.com/documentation/corelocation/cllocationmanager/1423523-authorizationstatus) | | `LocationManagerIOS.AuthorizationStatus` |
+| [`authorizationStatus`](https://developer.apple.com/documentation/corelocation/cllocationmanager/1423523-authorizationstatus) | | `AuthorizationStatus` |
 | [`locationServicesEnabled`](https://developer.apple.com/documentation/corelocation/cllocationmanager/1423648-locationservicesenabled) | | `bool` |
 | [`deferredLocationUpdatesAvailable`](https://developer.apple.com/documentation/corelocation/cllocationmanager/1423830-deferredlocationupdatesavailable) | | `bool` |
 | [`significantLocationChangeMonitoringAvailable`](https://developer.apple.com/documentation/corelocation/cllocationmanager/1423677-significantlocationchangemonitor) | | `bool` |
