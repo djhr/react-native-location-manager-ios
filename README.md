@@ -73,7 +73,7 @@ LocationManagerIOS.addListener(LocationManagerIOS.Events.didFailWithError, (err)
 });
 ```
 
-| Enum | Values
+| Enum | Keys
 |---|---|
 | [`AuthorizationStatus`](https://developer.apple.com/documentation/corelocation/clauthorizationstatus) | `NotDetermined`, `Restricted`, `Denied`, `AuthorizedAlways`, `AuthorizedWhenInUse`
 | [`LocationAccuracy`](https://developer.apple.com/documentation/corelocation/cllocationaccuracy) | `BestForNavigation`, `Best`, `NearestTenMeters`, `HundredMeters`, `Kilometer`, `ThreeKilometers`
