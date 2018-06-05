@@ -112,9 +112,9 @@ LocationManagerIOS.activityType = LocationManagerIOS.ActivityType.AutomotiveNavi
 | [`showsBackgroundLocationIndicator`](https://developer.apple.com/documentation/corelocation/cllocationmanager/2923541-showsbackgroundlocationindicator) | `bool` |
 | [`distanceFilter`](https://developer.apple.com/documentation/corelocation/cllocationmanager/1423500-distancefilter) | `double` |
 | [`desiredAccuracy`](https://developer.apple.com/documentation/corelocation/cllocationmanager/1423836-desiredaccuracy) | `double` |
-| [`activityType`](https://developer.apple.com/documentation/corelocation/cllocationmanager/1620567-activitytype) | `LocationManagerIOS.ActivityType` |
+| [`activityType`](https://developer.apple.com/documentation/corelocation/cllocationmanager/1620567-activitytype) | `ActivityType` |
 | [`headingFilter`](https://developer.apple.com/documentation/corelocation/cllocationmanager/1620550-headingfilter) | `double` |
-| [`headingOrientation`](https://developer.apple.com/documentation/corelocation/cllocationmanager/1620556-headingorientation) | `LocationManagerIOS.DeviceOrientation` |
+| [`headingOrientation`](https://developer.apple.com/documentation/corelocation/cllocationmanager/1620556-headingorientation) | `DeviceOrientation` |
 | [`maximumRegionMonitoringDistance`](https://developer.apple.com/documentation/corelocation/cllocationmanager/1423740-maximumregionmonitoringdistance) | `double` | `readonly`
 | [`monitoredRegions`](https://developer.apple.com/documentation/corelocation/cllocationmanager/1423790-monitoredregions) |  `Array<CircularRegion>` | `readonly`
 | [`gpsMonitoredRegions`](#custom) | `Array<CircularRegion>` | `readonly`, `custom`
@@ -131,7 +131,7 @@ See [`CLLocationManager`](https://developer.apple.com/documentation/corelocation
 
 | Method | Arguments | Return | Notes
 |---|---|---|---|
-| `addListener` | `event: string`, `listener: function` | `{ remove: function }` | `custom`
+| `addListener` | `event: string`, `listener: function` | `{remove: function}` | `custom`
 | [`authorizationStatus`](https://developer.apple.com/documentation/corelocation/cllocationmanager/1423523-authorizationstatus) | | `AuthorizationStatus` |
 | [`locationServicesEnabled`](https://developer.apple.com/documentation/corelocation/cllocationmanager/1423648-locationservicesenabled) | | `bool` |
 | [`deferredLocationUpdatesAvailable`](https://developer.apple.com/documentation/corelocation/cllocationmanager/1423830-deferredlocationupdatesavailable) | | `bool` |
