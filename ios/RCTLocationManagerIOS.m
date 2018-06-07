@@ -967,7 +967,7 @@ static NSDictionary<NSString*, id> *JSONCoordinate(CLLocationCoordinate2D coordi
 
 static id JSONTimestamp(NSDate *date)
 {
-  return isDistant(date) ? nil : @([date timeIntervalSince1970] * 1000); // ms
+  return isDistant(date) ? [NSNull null] : @([date timeIntervalSince1970] * 1000); // ms
 }
 
 static BOOL isDistant(NSDate *date)
