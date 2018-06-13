@@ -49,7 +49,7 @@ See [`CLLocationManagerDelegate`](https://developer.apple.com/documentation/core
 | Event | Listener Arguments | Notes
 |---|---|---|
 | [`didUpdateLocations`](https://developer.apple.com/documentation/corelocation/cllocationmanagerdelegate/1423615-locationmanager) | `locations: Array<Location>` |
-| [`didFailWith`](https://developer.apple.com/documentation/corelocation/cllocationmanagerdelegate/1423786-locationmanager) | `error: Error` |
+| [`didFailWithError`](https://developer.apple.com/documentation/corelocation/cllocationmanagerdelegate/1423786-locationmanager) | `error: Error` |
 | [`didFinishDeferredUpdatesWithError`](https://developer.apple.com/documentation/corelocation/cllocationmanagerdelegate/1423537-locationmanager) | `error: Error` |
 | [`didPauseLocationUpdates`](https://developer.apple.com/documentation/corelocation/cllocationmanagerdelegate/1621553-locationmanagerdidpauselocationu) |  |
 | [`didResumeLocationUpdates`](https://developer.apple.com/documentation/corelocation/cllocationmanagerdelegate/1621512-locationmanagerdidresumelocation) |  |
