@@ -119,7 +119,6 @@ LocationManagerIOS.activityType = LocationManagerIOS.ActivityType.AutomotiveNavi
 | [`headingOrientation`](https://developer.apple.com/documentation/corelocation/cllocationmanager/1620556-headingorientation) | `DeviceOrientation` |
 | [`maximumRegionMonitoringDistance`](https://developer.apple.com/documentation/corelocation/cllocationmanager/1423740-maximumregionmonitoringdistance) | `double` | `readonly`
 | [`monitoredRegions`](https://developer.apple.com/documentation/corelocation/cllocationmanager/1423790-monitoredregions) |  `Array<CircularRegion>` | `readonly`
-| [`gpsMonitoredRegions`](#custom) | `Array<CircularRegion>` | `readonly`, `custom`
 | [`rangedRegions`](https://developer.apple.com/documentation/corelocation/cllocationmanager/1620552-rangedregions) | `Array<BeaconRegion>` | `readonly`
 | [`location`](https://developer.apple.com/documentation/corelocation/cllocationmanager/1423687-location) | `Location` | `readonly`
 | [`heading`](https://developer.apple.com/documentation/corelocation/cllocationmanager/1620555-heading) | `Heading` | `readonly`
@@ -259,10 +258,7 @@ type Heading {
 Native implementation for:
 ```js
 const monitoredRegions = await LocationManagerIOS.monitoredRegions;
-const gpsMonitoredRegions = await LocationManagerIOS.gpsMonitoredRegions;
-
-gpsMonitoredRegions.concat(monitoredRegions)
-  .map(r => r.identifier)
+monitoredRegions.map(r => r.identifier)
   .forEach(LocationManagerIOS.stopMonitoringForRegion);
 ```
 
@@ -274,7 +270,3 @@ const rangedRegions = await LocationManagerIOS.rangedRegions;
 rangedRegions.map(r => r.identifier)
   .forEach(LocationManagerIOS.stopRangingBeaconsInRegion);
 ```
-
-
-#### LocationManagerIOS.gpsMonitoredRegions
-to be continued...

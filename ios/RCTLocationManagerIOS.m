@@ -21,11 +21,6 @@
 #import <React/RCTConvert.h>
 
 
-static NSString *const StorageDirectory = @"RNLocationManager";
-static NSString *const RegionsFileName = @"regions.json";
-static NSString *const StateFileName = @"state.json";
-
-
 @implementation RCTConvert (RCTLocationManagerIOS)
 
 + (CLLocationDistance)CLLocationDistance:(id)json
@@ -126,9 +121,6 @@ static NSString *const StateFileName = @"state.json";
 @implementation RCTLocationManagerIOS
 
 CLLocationManager *locationManager;
-NSMutableDictionary<NSString*, CLCircularRegion*> *gpsMonitoredRegions;
-NSMutableDictionary<NSString*, NSNumber*> *gpsMonitoredRegionsState;
-bool isUpdatingLocation;
 bool hasListeners;
 
 
@@ -140,9 +132,7 @@ bool hasListeners;
   if (self != nil) {
     locationManager = [CLLocationManager new];
     locationManager.delegate = self;
-    isUpdatingLocation = NO;
     hasListeners = NO;
-    [self resume];
   }
 
   return self;
@@ -164,166 +154,59 @@ bool hasListeners;
 }
 
 
-#pragma mark Private methods
-
--(void)resume
-{
-  gpsMonitoredRegions = [NSMutableDictionary new];
-  NSArray *items = JSONParseFile(RegionsFileName, NSArray.class);
-
-  for (id item in items) {
-    CLCircularRegion *region = [RCTConvert CLCircularRegion:item];
-    [gpsMonitoredRegions setObject:region forKey:region.identifier];
-  }
-
-  NSDictionary *state = JSONParseFile(StateFileName, NSDictionary.class);
-  gpsMonitoredRegionsState = [state mutableCopy];
-}
-
--(void)snapshot
-{
-  JSONWriteFile(RegionsFileName, JSONRegionArray([gpsMonitoredRegions allValues]));
-  JSONWriteFile(StateFileName, gpsMonitoredRegionsState);
-}
-
-- (void)startGPSMonitoringForRegion:(CLCircularRegion *)region
-{
-  CLLocationCoordinate2D coords = locationManager.location != nil
-    ? locationManager.location.coordinate
-    : kCLLocationCoordinate2DInvalid;
-
-  CLRegionState state = CLLocationCoordinate2DIsValid(coords)
-    ? [region containsCoordinate:coords] ? CLRegionStateInside : CLRegionStateOutside
-    : CLRegionStateUnknown;
-
-  [gpsMonitoredRegions setObject:region
-                          forKey:region.identifier];
-
-  [gpsMonitoredRegionsState setObject:[NSNumber numberWithInt:state]
-                               forKey:region.identifier];
-
-  [self snapshot];
-}
-
-- (void)stopGPSMonitoringForRegion:(CLCircularRegion *)region
-{
-  [gpsMonitoredRegions removeObjectForKey:region.identifier];
-  [gpsMonitoredRegionsState removeObjectForKey:region.identifier];
-
-  [self snapshot];
-}
-
-- (void)requestStateForGPSRegion:(CLCircularRegion *)region
-{
-  [self locationManager:locationManager
-      didDetermineState:[self stateForGPSRegion:region]
-              forRegion:region];
-}
-
-- (CLRegionState) stateForGPSRegion:(CLCircularRegion *)region
-{
-  NSNumber* state = [gpsMonitoredRegionsState objectForKey:region.identifier];
-  return state ? [state intValue] : CLRegionStateUnknown;
-}
-
-- (void) setState:(CLRegionState)state forGPSRegion:(CLCircularRegion *)region
-{
-  [gpsMonitoredRegionsState setObject:[NSNumber numberWithInt:state]
-                               forKey:region.identifier];
-}
-
-- (BOOL)shouldUseGPSMonitoringForRegion:(CLRegion *)region
-{
-  return isUpdatingLocation
-  && [region isKindOfClass:[CLCircularRegion class]]
-  && ((CLCircularRegion *) region).radius < 100;
-}
-
-- (void) updateGPSRegionsState:(CLLocation *)location
-{
-  CLLocationCoordinate2D coords = location.coordinate;
-
-  for (NSString *identifier in gpsMonitoredRegions) {
-    CLCircularRegion *region = [gpsMonitoredRegions objectForKey:identifier];
-    CLRegionState state = [self stateForGPSRegion:region];
-    CLCircularRegion *oRegion = [[CLCircularRegion alloc] initWithCenter:region.center
-                                                                  radius:region.radius * 1.25
-                                                              identifier:region.identifier];
-
-    if (state == CLRegionStateUnknown) {
-      CLRegionState newState = [region containsCoordinate:coords] ? CLRegionStateInside : CLRegionStateOutside;
-      [self setState:newState forGPSRegion:region];
-
-    } else if (state == CLRegionStateOutside && [region containsCoordinate:coords]) {
-      [self setState:CLRegionStateInside forGPSRegion:region];
-      if (region.notifyOnEntry) [self locationManager:locationManager didEnterRegion:region];
-
-    } else if (state == CLRegionStateInside && ![oRegion containsCoordinate:coords]) {
-      [self setState:CLRegionStateOutside forGPSRegion:region];
-      if (region.notifyOnExit) [self locationManager:locationManager didExitRegion:region];
-    }
-
-    CLRegionState newState = [self stateForGPSRegion:region];
-    if (state != newState) [self locationManager:locationManager didDetermineState:newState forRegion:region];
-  }
-
-  [self snapshot];
-}
-
-
 #pragma mark - CLLocationManagerDelegate
 
 - (void)locationManager:(CLLocationManager *)manager
      didUpdateLocations:(NSArray<CLLocation *> *)locations
 {
-  if (hasListeners) [self sendEventWithName:@"didUpdateLocations" body:JSONLocationArray(locations)];
-  [self updateGPSRegionsState:locations.lastObject];
+  if (manager != locationManager || !hasListeners) return;
+  [self sendEventWithName:@"didUpdateLocations" body:JSONLocationArray(locations)];
 }
 
 - (void)locationManager:(CLLocationManager *)manager
        didFailWithError:(NSError *)error
 {
-  if (!hasListeners) return;
+  if (manager != locationManager || !hasListeners) return;
   [self sendEventWithName:@"didFailWithError" body:JSONError(error)];
 }
 
 - (void)locationManager:(CLLocationManager *)manager
 didFinishDeferredUpdatesWithError:(NSError *)error
 {
-  if (!hasListeners) return;
+  if (manager != locationManager || !hasListeners) return;
   [self sendEventWithName:@"didFinishDeferredUpdatesWithError" body:JSONError(error)];
 }
 
 - (void)locationManagerDidPauseLocationUpdates:(CLLocationManager *)manager
 {
-  if (!hasListeners) return;
+  if (manager != locationManager || !hasListeners) return;
   [self sendEventWithName:@"didPauseLocationUpdates" body:nil];
 }
 
 - (void)locationManagerDidResumeLocationUpdates:(CLLocationManager *)manager
 {
-  if (!hasListeners) return;
+  if (manager != locationManager || !hasListeners) return;
   [self sendEventWithName:@"didResumeLocationUpdates" body:nil];
 }
 
 - (void)locationManager:(CLLocationManager *)manager
        didUpdateHeading:(CLHeading *)newHeading
 {
-  if (!hasListeners) return;
+  if (manager != locationManager || !hasListeners) return;
   [self sendEventWithName:@"didUpdateHeading" body: JSONHeading(newHeading)];
 }
 
 - (void)locationManager:(CLLocationManager *)manager
          didEnterRegion:(CLRegion *)region
 {
-  if (!hasListeners) return;
+  if (manager != locationManager || !hasListeners) return;
   [self sendEventWithName:@"didEnterRegion" body:JSONRegion(region)];
 }
 
 - (void)locationManager:(CLLocationManager *)manager
           didExitRegion:(CLRegion *)region
 {
-  if (!hasListeners) return;
+  if (manager != locationManager || !hasListeners) return;
   [self sendEventWithName:@"didExitRegion" body:JSONRegion(region)];
 }
 
@@ -331,7 +214,7 @@ didFinishDeferredUpdatesWithError:(NSError *)error
       didDetermineState:(CLRegionState)state
               forRegion:(CLRegion *)region
 {
-  if (!hasListeners) return;
+  if (manager != locationManager || !hasListeners) return;
   [self sendEventWithName:@"didDetermineStateForRegion" body:@{@"state": @(state), @"region": JSONRegion(region)}];
 }
 
@@ -339,14 +222,14 @@ didFinishDeferredUpdatesWithError:(NSError *)error
 monitoringDidFailForRegion:(CLRegion *)region
               withError:(NSError *)error
 {
-  if (!hasListeners) return;
+  if (manager != locationManager || !hasListeners) return;
   [self sendEventWithName:@"monitoringDidFailForRegion" body:@{@"region": JSONRegion(region), @"error": JSONError(error)}];
 }
 
 - (void)locationManager:(CLLocationManager *)manager
 didStartMonitoringForRegion:(CLRegion *)region
 {
-  if (!hasListeners) return;
+  if (manager != locationManager || !hasListeners) return;
   [self sendEventWithName:@"didStartMonitoringForRegion" body:JSONRegion(region)];
 }
 
@@ -354,7 +237,7 @@ didStartMonitoringForRegion:(CLRegion *)region
         didRangeBeacons:(NSArray<CLBeacon *> *)beacons
                inRegion:(CLBeaconRegion *)region
 {
-  if (!hasListeners) return;
+  if (manager != locationManager || !hasListeners) return;
   [self sendEventWithName:@"didRangeBeaconsInRegion" body:@{@"beacons": JSONBeaconArray(beacons), @"region": JSONRegion(region)}];
 }
 
@@ -362,21 +245,21 @@ didStartMonitoringForRegion:(CLRegion *)region
 rangingBeaconsDidFailForRegion:(CLBeaconRegion *)region
               withError:(NSError *)error
 {
-  if (!hasListeners) return;
+  if (manager != locationManager || !hasListeners) return;
   [self sendEventWithName:@"rangingBeaconsDidFailForRegion" body:@{@"region": JSONRegion(region), @"error": JSONError(error)}];
 }
 
 - (void)locationManager:(CLLocationManager *)manager
                didVisit:(CLVisit *)visit
 {
-  if (!hasListeners) return;
+  if (manager != locationManager || !hasListeners) return;
   [self sendEventWithName:@"didVisit" body:JSONVisit(visit)];
 }
 
 - (void)locationManager:(CLLocationManager *)manager
 didChangeAuthorizationStatus:(CLAuthorizationStatus)status
 {
-  if (!hasListeners) return;
+  if (manager != locationManager || !hasListeners) return;
   [self sendEventWithName:@"didChangeAuthorizationStatus" body:@(status)];
 }
 
@@ -518,13 +401,11 @@ RCT_EXPORT_METHOD(requestAlwaysAuthorization)
 RCT_EXPORT_METHOD(startUpdatingLocation)
 {
   [locationManager startUpdatingLocation];
-  isUpdatingLocation = YES;
 }
 
 RCT_EXPORT_METHOD(stopUpdatingLocation)
 {
   [locationManager stopUpdatingLocation];
-  isUpdatingLocation = NO;
 }
 
 RCT_EXPORT_METHOD(requestLocation)
@@ -559,11 +440,7 @@ RCT_EXPORT_METHOD(dismissHeadingCalibrationDisplay)
 
 RCT_EXPORT_METHOD(startMonitoringForRegion:(CLRegion *) region)
 {
-  if ([self shouldUseGPSMonitoringForRegion:region]) {
-    [self startGPSMonitoringForRegion:(CLCircularRegion *)region];
-  } else {
-    [locationManager startMonitoringForRegion: region];
-  }
+  [locationManager startMonitoringForRegion: region];
 }
 
 RCT_EXPORT_METHOD(stopMonitoringForRegion:(NSString *) identifier)
@@ -571,12 +448,11 @@ RCT_EXPORT_METHOD(stopMonitoringForRegion:(NSString *) identifier)
   for (CLRegion *region in [locationManager monitoredRegions]) {
     if ([region.identifier isEqualToString:identifier]) {
       [locationManager stopMonitoringForRegion: region];
-      break;
+      return;
     }
   }
-
-  CLCircularRegion *region = [gpsMonitoredRegions objectForKey:identifier];
-  if (region != nil) [self stopGPSMonitoringForRegion: region];
+  
+  RCTLogWarn(@"Couldn't find region '%@' in monitoredRegions", identifier);
 }
 
 RCT_EXPORT_METHOD(stopMonitoringForAllRegions)
@@ -584,10 +460,6 @@ RCT_EXPORT_METHOD(stopMonitoringForAllRegions)
   for (CLRegion *region in [locationManager monitoredRegions]) {
     [locationManager stopMonitoringForRegion: region];
   }
-
-  [gpsMonitoredRegions removeAllObjects];
-  [gpsMonitoredRegionsState removeAllObjects];
-  [self snapshot];
 }
 
 RCT_EXPORT_METHOD(startRangingBeaconsInRegion:(CLBeaconRegion *) region)
@@ -619,12 +491,11 @@ RCT_EXPORT_METHOD(requestStateForRegion:(NSString *) identifier)
   for (CLRegion *region in [locationManager monitoredRegions]) {
     if ([region.identifier isEqualToString:identifier]) {
       [locationManager requestStateForRegion: region];
-      break;
+      return;
     }
   }
 
-  CLCircularRegion *region = [gpsMonitoredRegions objectForKey:identifier];
-  if (region != nil) [self requestStateForGPSRegion: region];
+  RCTLogWarn(@"Couldn't find region '%@' in monitoredRegions", identifier);
 }
 
 RCT_EXPORT_METHOD(startMonitoringVisits)
@@ -752,12 +623,6 @@ RCT_EXPORT_METHOD(getMonitoredRegions:(RCTPromiseResolveBlock)resolve
   resolve(JSONRegionArray([locationManager.monitoredRegions allObjects]));
 }
 
-RCT_EXPORT_METHOD(getGPSMonitoredRegions:(RCTPromiseResolveBlock)resolve
-                            withRejecter:(RCTPromiseRejectBlock) reject)
-{
-  resolve(JSONRegionArray([gpsMonitoredRegions allValues]));
-}
-
 RCT_EXPORT_METHOD(getRangedRegions:(RCTPromiseResolveBlock)resolve
                       withRejecter:(RCTPromiseRejectBlock) reject)
 {
@@ -774,60 +639,6 @@ RCT_EXPORT_METHOD(getHeading:(RCTPromiseResolveBlock)resolve
                 withRejecter:(RCTPromiseRejectBlock) reject)
 {
   resolve(JSONHeading(locationManager.heading));
-}
-
-
-#pragma mark - IO
-
-static NSString *GetPathForFile(NSString *filename)
-{
-  NSString *base = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES).firstObject;
-  NSString *dir = [base stringByAppendingPathComponent:StorageDirectory];
-
-  return filename ? [dir stringByAppendingPathComponent:filename] : dir;
-}
-
-static BOOL MKDIR(NSString *path)
-{
-  return [[NSFileManager defaultManager] createDirectoryAtPath:path
-                                   withIntermediateDirectories:YES
-                                                    attributes:nil
-                                                         error:nil];
-}
-
-static id JSONParseFile(NSString *filename, Class class)
-{
-  NSString *path = GetPathForFile(filename);
-  if (![[NSFileManager defaultManager] fileExistsAtPath:path]) return [[class alloc] init];
-
-  NSError *error;
-  NSData *data = [NSData dataWithContentsOfFile:path];
-
-  id object = [NSJSONSerialization JSONObjectWithData:data
-                                              options:kNilOptions
-                                                error:&error];
-
-  if (error) RCTLogWarn(@"Error parsing JSON: %@", error);
-
-  return error || !object ? [[class alloc] init] : object;
-}
-
-static BOOL JSONWriteFile(NSString *filename, id obj)
-{
-  NSString *home = GetPathForFile(nil);
-  if (![[NSFileManager defaultManager] fileExistsAtPath:home]) MKDIR(home);
-
-  NSString *path = GetPathForFile(filename);
-  if (![[NSFileManager defaultManager] fileExistsAtPath:path]) MKDIR(GetPathForFile(nil));
-
-  NSError *error;
-  NSData *data = [NSJSONSerialization dataWithJSONObject:obj
-                                                 options:NSJSONWritingPrettyPrinted
-                                                   error:&error];
-
-  if (error) RCTLogWarn(@"Error serializing JSON: %@", error);
-
-  return error ? NO : [data writeToFile:path atomically:YES];
 }
 
 
