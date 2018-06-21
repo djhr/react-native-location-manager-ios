@@ -193,10 +193,6 @@ export default class LocationManagerIOS {
         return NativeModule.getMonitoredRegions();
     }
 
-    static get gpsMonitoredRegions() {
-        return NativeModule.getGPSMonitoredRegions();
-    }
-
     static get rangedRegions() {
         return NativeModule.getRangedRegions();
     }
